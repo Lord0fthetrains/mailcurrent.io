@@ -270,8 +270,24 @@ def dashboard_api_view(request):
 @login_required
 def dashboard_analytics_view(request):
     """Dashboard Analytics tab with comprehensive email tracking"""
+    from api.analytics_service import AnalyticsService
+    import json
+    
+    # Get analytics data directly
+    days = int(request.GET.get('days', 30))
+    stats = AnalyticsService.get_email_stats(request.user, days)
+    recent_events = AnalyticsService.get_recent_events(request.user, 20)
+    top_recipients = AnalyticsService.get_top_recipients(request.user, 10)
+    
     context = {
-        'user': request.user
+        'user': request.user,
+        'analytics_data': json.dumps({
+            'stats': stats,
+            'recent_events': recent_events,
+            'top_recipients': top_recipients,
+            'days': days
+        }),
+        'current_period': days
     }
     return render(request, 'dashboard/analytics.html', context)
 

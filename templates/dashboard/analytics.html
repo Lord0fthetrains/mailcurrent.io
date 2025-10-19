@@ -317,50 +317,43 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 let volumeChart, eventChart;
-let currentPeriod = 7;
+
+// Server-side data
+const analyticsData = {{ analytics_data|safe }};
+let currentPeriod = {{ current_period|default:30 }};
 
 // Initialize analytics on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Set the correct radio button
+    const currentRadio = document.querySelector(`input[name="period"][value="${currentPeriod}"]`);
+    if (currentRadio) {
+        currentRadio.checked = true;
+    }
+    
     loadAnalytics();
     
     // Set up period change listeners
     document.querySelectorAll('input[name="period"]').forEach(radio => {
         radio.addEventListener('change', function() {
             currentPeriod = parseInt(this.value);
-            loadAnalytics();
+            // Reload page with new period
+            window.location.href = `?days=${currentPeriod}`;
         });
     });
 });
 
-async function loadAnalytics() {
+function loadAnalytics() {
     try {
-        // Show loading state
-        showLoadingState();
+        // Use server-side data
+        const stats = analyticsData.stats;
+        const events = analyticsData.recent_events;
+        const recipients = analyticsData.top_recipients;
         
-        // Load analytics data
-        const [statsResponse, eventsResponse, recipientsResponse] = await Promise.all([
-            fetch(`/api/v1/analytics/stats/?days=${currentPeriod}`),
-            fetch(`/api/v1/analytics/events/?limit=20`),
-            fetch(`/api/v1/analytics/recipients/?limit=10`)
-        ]);
-        
-        const stats = await statsResponse.json();
-        const events = await eventsResponse.json();
-        const recipients = await recipientsResponse.json();
-        
-        if (stats.success) {
-            updateMetrics(stats.stats);
-            updateCharts(stats.stats);
-            updateTemplateTable(stats.stats.template_performance);
-        }
-        
-        if (events.success) {
-            updateEventsTimeline(events.events);
-        }
-        
-        if (recipients.success) {
-            updateRecipientsTable(recipients.recipients);
-        }
+        updateMetrics(stats);
+        updateCharts(stats);
+        updateTemplateTable(stats.template_performance);
+        updateEventsTimeline(events);
+        updateRecipientsTable(recipients);
         
     } catch (error) {
         console.error('Error loading analytics:', error);
