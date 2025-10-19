@@ -1,0 +1,42 @@
+{{ notification_title }} - {{ app_name }}
+
+Hello {{ user_name }},
+
+{{ notification_message }}
+
+{% if priority %}
+PRIORITY: {{ priority|upper }}
+This notification has been marked as {{ priority }} priority.
+
+{% endif %}
+{% if details %}
+Details:
+{% for detail in details %}
+- {{ detail }}
+{% endfor %}
+
+{% endif %}
+{% if action_url %}
+{% if action_text %}
+{{ action_text }}
+{% else %}
+Click the link below to take action:
+{% endif %}
+{{ action_url }}
+
+{% endif %}
+{% if additional_info %}
+{{ additional_info }}
+
+{% endif %}
+Notification sent on {{ current_date }} at {{ current_time }}
+
+If you have any questions about this notification, please contact our support team.
+
+Best regards,
+The {{ app_name }} Team
+
+---
+This notification was sent to {{ user_email }}.
+
+© {{ current_year }} {{ app_name }}. All rights reserved.

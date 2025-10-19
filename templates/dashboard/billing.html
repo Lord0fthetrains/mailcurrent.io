@@ -1,0 +1,356 @@
+{% extends 'base.html' %}
+
+{% block title %}Billing - MailCurrent.io{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted mb-3">Dashboard</h6>
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dashboard' %}">
+                                <i class="bi bi-speedometer2 me-2"></i>Overview
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'profile' %}">
+                                <i class="bi bi-person me-2"></i>Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'billing' %}">
+                                <i class="bi bi-credit-card me-2"></i>Billing
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dashboard_api' %}">
+                                <i class="bi bi-code-slash me-2"></i>API
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'api_docs' %}">
+                                <i class="bi bi-book me-2"></i>API Docs
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <div class="row mb-4">
+                <div class="col">
+                    <h2 class="fw-bold">Billing & Subscription</h2>
+                    <p class="text-muted">Manage your subscription and payment methods.</p>
+                </div>
+            </div>
+            
+            <!-- Current Subscription -->
+            <div class="row mb-4">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Current Subscription</h5>
+                            <span class="badge bg-success">{{ subscription.status|title }}</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-muted">Plan</h6>
+                                    <h4 class="fw-bold">{{ subscription.plan.name }}</h4>
+                                    <p class="text-muted">{{ subscription.plan.description }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-muted">Billing Cycle</h6>
+                                    <h5 class="fw-bold">{{ subscription.billing_cycle|title }}</h5>
+                                    <p class="text-muted">
+                                        {% if subscription.billing_cycle == 'monthly' %}
+                                            ${{ subscription.plan.price_monthly }}/month
+                                        {% else %}
+                                            ${{ subscription.plan.price_yearly }}/year
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <h6 class="text-muted">Current Period</h6>
+                                    <p class="mb-0">
+                                        {{ subscription.current_period_start|date:"M d, Y" }} - 
+                                        {{ subscription.current_period_end|date:"M d, Y" }}
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-muted">Usage This Period</h6>
+                                    <p class="mb-0">
+                                        {{ subscription.emails_sent_this_period }} / {{ subscription.plan.emails_per_month }} emails
+                                    </p>
+                                    <div class="progress mt-2" style="height: 8px;">
+                                        <div class="progress-bar" role="progressbar" 
+                                             style="width: {% widthratio subscription.emails_sent_this_period subscription.plan.emails_per_month 100 %}%">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <button class="btn btn-outline-primary me-2" onclick="openBillingPortal()">
+                                    <i class="bi bi-gear me-1"></i>Manage Subscription
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="loadPaymentMethods()">
+                                    <i class="bi bi-credit-card me-1"></i>Payment Methods
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Available Plans -->
+            <div class="row mb-4">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Available Plans</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row" id="plans-container">
+                                <div class="col-12 text-center">
+                                    <div class="spinner-border" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Billing History -->
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Billing History</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="billing-history-container">
+                                <div class="text-center">
+                                    <div class="spinner-border" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Plan Selection Modal -->
+<div class="modal fade" id="planModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Plan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="planForm">
+                    <div class="mb-3">
+                        <label class="form-label">Billing Cycle</label>
+                        <select class="form-select" id="billingCycle" name="billing_cycle">
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly (Save 20%)</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="changePlan()">Change Plan</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentPlanId = {{ subscription.plan.id }};
+
+// Load available plans
+async function loadPlans() {
+    try {
+        const response = await fetch('/api/v1/accounts/plans/');
+        const plans = await response.json();
+        
+        const container = document.getElementById('plans-container');
+        container.innerHTML = '';
+        
+        plans.forEach(plan => {
+            const isCurrentPlan = plan.id === currentPlanId;
+            const card = document.createElement('div');
+            card.className = `col-md-4 mb-3`;
+            card.innerHTML = `
+                <div class="card h-100 ${isCurrentPlan ? 'border-primary' : ''}">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">${plan.name}</h5>
+                        <div class="display-6 fw-bold mb-3">
+                            $${plan.price_monthly}<span class="fs-6 text-muted">/month</span>
+                        </div>
+                        <p class="text-muted mb-4">${plan.description}</p>
+                        <ul class="list-unstyled mb-4">
+                            <li class="mb-2">
+                                <i class="bi bi-check text-success me-2"></i>
+                                ${plan.emails_per_month.toLocaleString()} emails/month
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check text-success me-2"></i>
+                                ${plan.api_keys_limit} API keys
+                            </li>
+                            ${plan.custom_templates ? '<li class="mb-2"><i class="bi bi-check text-success me-2"></i>Custom templates</li>' : ''}
+                            ${plan.attachments ? '<li class="mb-2"><i class="bi bi-check text-success me-2"></i>Attachments</li>' : ''}
+                            ${plan.webhooks ? '<li class="mb-2"><i class="bi bi-check text-success me-2"></i>Webhooks</li>' : ''}
+                            ${plan.analytics ? '<li class="mb-2"><i class="bi bi-check text-success me-2"></i>Analytics</li>' : ''}
+                        </ul>
+                        ${isCurrentPlan ? 
+                            '<span class="badge bg-primary">Current Plan</span>' : 
+                            `<button class="btn btn-outline-primary" onclick="selectPlan(${plan.id})">Select Plan</button>`
+                        }
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    } catch (error) {
+        console.error('Error loading plans:', error);
+        document.getElementById('plans-container').innerHTML = '<div class="col-12 text-center text-danger">Error loading plans</div>';
+    }
+}
+
+// Load billing history
+async function loadBillingHistory() {
+    try {
+        const response = await fetch('/api/v1/accounts/billing/');
+        const history = await response.json();
+        
+        const container = document.getElementById('billing-history-container');
+        
+        if (history.length === 0) {
+            container.innerHTML = '<p class="text-muted text-center">No billing history found</p>';
+            return;
+        }
+        
+        let html = '<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead><tbody>';
+        
+        history.forEach(item => {
+            html += `
+                <tr>
+                    <td>${new Date(item.billed_at).toLocaleDateString()}</td>
+                    <td>Invoice ${item.invoice_id}</td>
+                    <td>$${item.amount} ${item.currency.toUpperCase()}</td>
+                    <td><span class="badge bg-${item.status === 'paid' ? 'success' : 'danger'}">${item.status}</span></td>
+                </tr>
+            `;
+        });
+        
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+    } catch (error) {
+        console.error('Error loading billing history:', error);
+        document.getElementById('billing-history-container').innerHTML = '<p class="text-danger text-center">Error loading billing history</p>';
+    }
+}
+
+// Select a plan
+function selectPlan(planId) {
+    currentPlanId = planId;
+    const modal = new bootstrap.Modal(document.getElementById('planModal'));
+    modal.show();
+}
+
+// Change plan
+async function changePlan() {
+    const billingCycle = document.getElementById('billingCycle').value;
+    
+    try {
+        const response = await fetch('/api/v1/accounts/subscription/update/', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+            body: JSON.stringify({
+                plan_id: currentPlanId,
+                billing_cycle: billingCycle
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Error changing plan:', error);
+        alert('Error changing plan');
+    }
+}
+
+// Open Stripe billing portal
+async function openBillingPortal() {
+    try {
+        const response = await fetch('/api/v1/accounts/billing-portal/');
+        const result = await response.json();
+        
+        if (result.success) {
+            window.open(result.url, '_blank');
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Error opening billing portal:', error);
+        alert('Error opening billing portal');
+    }
+}
+
+// Load payment methods
+async function loadPaymentMethods() {
+    try {
+        const response = await fetch('/api/v1/accounts/payment-methods/');
+        const result = await response.json();
+        
+        if (result.success) {
+            if (result.payment_methods.length === 0) {
+                alert('No payment methods found');
+            } else {
+                // Open Stripe billing portal for payment method management
+                openBillingPortal();
+            }
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Error loading payment methods:', error);
+        alert('Error loading payment methods');
+    }
+}
+
+// Load data when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    loadPlans();
+    loadBillingHistory();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,350 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - MailCurrent.io{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <img src="{% static 'images/logos/MailLogo_trim.png' %}" alt="MailCurrent.io" height="30" class="mb-2">
+                    </div>
+                    <h6 class="card-title text-muted mb-3">Dashboard</h6>
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'dashboard' %}">
+                                <i class="bi bi-speedometer2 me-2"></i>Overview
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'profile' %}">
+                                <i class="bi bi-person me-2"></i>Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'billing' %}">
+                                <i class="bi bi-credit-card me-2"></i>Billing
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dashboard_api' %}">
+                                <i class="bi bi-code-slash me-2"></i>API
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'api_docs' %}">
+                                <i class="bi bi-book me-2"></i>API Docs
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <!-- Welcome Section -->
+            <div class="row mb-4">
+                <div class="col">
+                    <h2 class="fw-bold">Welcome back, {{ user.first_name|default:user.email }}!</h2>
+                    <p class="text-muted">Here's what's happening with your MailCurrent.io service.</p>
+                </div>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title text-light">Emails This Month</h6>
+                                    <h3 class="fw-bold">{{ usage_stats.emails_this_month|default:0 }}</h3>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-envelope-fill fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title text-light">API Keys</h6>
+                                    <h3 class="fw-bold">{{ api_keys|length }}</h3>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-key-fill fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title text-light">Remaining</h6>
+                                    <h3 class="fw-bold">{{ usage_stats.emails_remaining|default:0 }}</h3>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-graph-down fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title text-light">Current Plan</h6>
+                                    <h5 class="fw-bold">{{ subscription.plan.name|default:"No Plan" }}</h5>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-award-fill fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Usage Progress -->
+            {% if subscription.plan %}
+            <div class="row mb-4">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Monthly Usage</h5>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>{{ usage_stats.emails_this_month|default:0 }} emails sent</span>
+                                <span>{{ subscription.plan.emails_per_month }} limit</span>
+                            </div>
+                            <div class="progress usage-bar">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: {% widthratio usage_stats.emails_this_month|default:0 subscription.plan.emails_per_month 100 %}%">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            
+            <!-- Recent Emails -->
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Recent Emails</h5>
+                            {% if pagination.total_emails > pagination.per_page %}
+                            <div class="pagination-info">
+                                <small class="text-muted">
+                                    Page {{ pagination.current_page }} of {{ pagination.total_pages }} ({{ pagination.total_emails }} total emails)
+                                </small>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            {% if recent_emails %}
+                                <!-- Debug: {{ recent_emails|length }} emails found -->
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>To</th>
+                                                <th>Subject</th>
+                                                <th>Template</th>
+                                                <th>Status</th>
+                                                <th>Sent At</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for email in recent_emails %}
+                                            <tr style="cursor: pointer;" onclick="console.log('Email data:', {{ email.id }}, '{{ email.to_email|escapejs }}', '{{ email.sent_at|date:"M d, Y H:i"|default:"Not sent" }}', '{{ email.error_message|default:""|escapejs }}'); showEmailPreview({{ email.id }}, '{{ email.to_email|escapejs }}', '{{ email.subject|escapejs }}', '{{ email.html_content|escapejs }}', '{{ email.status }}', '{{ email.sent_at|date:"M d, Y H:i"|default:"Not sent" }}', '{{ email.template_used|default:""|escapejs }}', '{{ email.error_message|default:""|escapejs }}')">
+                                                <td>{{ email.to_email }}</td>
+                                                <td>{{ email.subject|truncatechars:50 }}</td>
+                                                <td>
+                                                    {% if email.template_used %}
+                                                        <span class="badge bg-info">{{ email.template_used }}</span>
+                                                    {% else %}
+                                                        <span class="text-muted">Custom</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if email.status == 'sent' %}
+                                                        <span class="badge bg-success">Sent</span>
+                                                    {% elif email.status == 'failed' %}
+                                                        <span class="badge bg-danger">Failed</span>
+                                                    {% else %}
+                                                        <span class="badge bg-warning">{{ email.status|title }}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if email.sent_at %}
+                                                        {{ email.sent_at|date:"M d, Y H:i" }}
+                                                    {% else %}
+                                                        <span class="text-muted">Not sent</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <!-- Pagination Controls -->
+                                {% if pagination.total_pages > 1 %}
+                                <nav aria-label="Recent emails pagination" class="mt-3">
+                                    <ul class="pagination justify-content-center">
+                                        <li class="page-item {% if not pagination.has_previous %}disabled{% endif %}">
+                                            <a class="page-link" href="?page={{ pagination.current_page|add:"-1" }}" {% if not pagination.has_previous %}tabindex="-1"{% endif %}>Previous</a>
+                                        </li>
+                                        
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ pagination.current_page }}</span>
+                                        </li>
+                                        
+                                        <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                                            <a class="page-link" href="?page={{ pagination.current_page|add:"1" }}" {% if not pagination.has_next %}tabindex="-1"{% endif %}>Next</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                                {% endif %}
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="bi bi-envelope text-muted" style="font-size: 3rem;"></i>
+                                    <h5 class="text-muted mt-3">No Emails Sent</h5>
+                                    <p class="text-muted">Start sending emails using your API keys.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Email Preview Modal -->
+<div class="modal fade" id="emailPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Email Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>To:</strong> <span id="previewTo"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Status:</strong> <span id="previewStatus"></span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Subject:</strong> <span id="previewSubject"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Sent At:</strong> <span id="previewSentAt"></span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <strong>Template:</strong> <span id="previewTemplate"></span>
+                    </div>
+                </div>
+                <div class="row mb-3" id="errorMessageRow" style="display: none;">
+                    <div class="col-12">
+                        <strong>Error Message:</strong> 
+                        <div id="previewErrorMessage" class="alert alert-danger mt-2 mb-0"></div>
+                    </div>
+                </div>
+                <hr>
+                <div class="mb-3">
+                    <strong>Content Preview:</strong>
+                </div>
+                <div id="previewContent" class="border p-3 rounded" style="max-height: 400px; overflow-y: auto; background-color: #f8f9fa;">
+                    <!-- Email content will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+
+// Email preview function
+function showEmailPreview(emailId, toEmail, subject, htmlContent, status, sentAt, templateUsed, errorMessage) {
+    // Populate modal fields
+    document.getElementById('previewTo').textContent = toEmail;
+    document.getElementById('previewSubject').textContent = subject;
+    document.getElementById('previewSentAt').textContent = sentAt;
+    document.getElementById('previewTemplate').textContent = templateUsed || 'Custom';
+    
+    // Handle error message
+    const errorRow = document.getElementById('errorMessageRow');
+    const errorDiv = document.getElementById('previewErrorMessage');
+    
+    if (errorMessage && errorMessage.trim()) {
+        errorDiv.textContent = errorMessage;
+        errorRow.style.display = 'block';
+    } else {
+        errorRow.style.display = 'none';
+    }
+    
+    // Set status badge
+    const statusElement = document.getElementById('previewStatus');
+    statusElement.innerHTML = '';
+    const statusBadge = document.createElement('span');
+    statusBadge.className = 'badge ';
+    
+    if (status === 'sent') {
+        statusBadge.className += 'bg-success';
+        statusBadge.textContent = 'Sent';
+    } else if (status === 'failed') {
+        statusBadge.className += 'bg-danger';
+        statusBadge.textContent = 'Failed';
+    } else {
+        statusBadge.className += 'bg-warning';
+        statusBadge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+    }
+    
+    statusElement.appendChild(statusBadge);
+    
+    // Set content preview
+    const contentElement = document.getElementById('previewContent');
+    if (htmlContent && htmlContent.trim()) {
+        contentElement.innerHTML = htmlContent;
+    } else {
+        contentElement.innerHTML = '<div class="text-center text-muted py-4"><i class="bi bi-envelope-open fs-1 mb-3"></i><p>Email content preview not available</p><small class="text-muted">The email was sent successfully, but the content is not stored for privacy reasons.</small></div>';
+    }
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('emailPreviewModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

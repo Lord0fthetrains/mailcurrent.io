@@ -1,0 +1,38 @@
+Welcome to {{ app_name }}!
+
+Hello {{ user_name }},
+
+Welcome to {{ app_name }}! We're excited to have you on board. 
+{% if welcome_message %}
+{{ welcome_message }}
+{% else %}
+Your account has been successfully created and you're ready to get started.
+{% endif %}
+
+{% if features %}
+What you can do:
+{% for feature in features %}
+- {{ feature }}
+{% endfor %}
+
+{% endif %}
+{% if verification_link %}
+To complete your registration, please verify your email address by visiting:
+{{ verification_link }}
+
+{% endif %}
+{% if login_url %}
+You can now log in to your account and start using {{ app_name }}:
+{{ login_url }}
+
+{% endif %}
+If you have any questions or need assistance, please don't hesitate to contact our support team.
+
+Best regards,
+The {{ app_name }} Team
+
+---
+This email was sent to {{ user_email }}. 
+If you didn't create an account with {{ app_name }}, please ignore this email.
+
+© {{ current_year }} {{ app_name }}. All rights reserved.

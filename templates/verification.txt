@@ -1,0 +1,36 @@
+Email Verification - {{ app_name }}
+
+Hello {{ user_name }},
+
+Thank you for signing up with {{ app_name }}! To complete your registration and secure your account, 
+please verify your email address.
+
+{% if verification_code %}
+Your verification code is: {{ verification_code }}
+
+Enter this code in the verification form to activate your account.
+
+{% endif %}
+{% if verification_link %}
+Click the link below to verify your email address:
+{{ verification_link }}
+
+{% endif %}
+{% if expiry_time %}
+IMPORTANT: This verification link will expire in {{ expiry_time }}.
+If you don't verify your email within this time, you'll need to request a new verification email.
+
+{% endif %}
+SECURITY NOTICE: 
+If you didn't create an account with {{ app_name }}, please ignore this email. 
+Your email address will not be verified and no account will be created.
+
+If you're having trouble with the verification process, please contact our support team.
+
+Best regards,
+The {{ app_name }} Team
+
+---
+This verification email was sent to {{ user_email }}.
+
+© {{ current_year }} {{ app_name }}. All rights reserved.

@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}API - MailCurrent.io{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <img src="{% static 'images/logos/MailLogo_trim.png' %}" alt="MailCurrent.io" height="30" class="mb-2">
+                    </div>
+                    <h6 class="card-title text-muted mb-3">Dashboard</h6>
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dashboard' %}">
+                                <i class="bi bi-speedometer2 me-2"></i>Overview
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'profile' %}">
+                                <i class="bi bi-person me-2"></i>Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'billing' %}">
+                                <i class="bi bi-credit-card me-2"></i>Billing
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'dashboard_api' %}">
+                                <i class="bi bi-code-slash me-2"></i>API
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'api_docs' %}">
+                                <i class="bi bi-book me-2"></i>API Docs
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <!-- Header Section -->
+            <div class="row mb-4">
+                <div class="col">
+                    <h2 class="fw-bold">API Explorer</h2>
+                    <p class="text-muted">Test our API endpoints directly from your browser.</p>
+                </div>
+            </div>
+            
+            <!-- Interactive API Explorer -->
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                You need to be logged in to use the interactive API explorer. 
+                                <a href="{% url 'login' %}" class="text-decoration-none">Sign in here</a>.
+                            </div>
+                            
+                            {% if user.is_authenticated %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>Test Send Email</h5>
+                                    <form id="testSendForm">
+                                        {% csrf_token %}
+                                        <div class="mb-3">
+                                            <label class="form-label">API Key</label>
+                                            <select class="form-select" id="apiKeySelect" required>
+                                                <option value="">Loading API keys...</option>
+                                            </select>
+                                            <div class="form-text">
+                                                <a href="{% url 'profile' %}" target="_blank">Manage API keys</a>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">To Email</label>
+                                            <input type="email" class="form-control" name="to" value="{{ user.email }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Subject</label>
+                                            <input type="text" class="form-control" name="subject" value="Test Email" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Message</label>
+                                            <textarea class="form-control" name="html" rows="3" required>&lt;h1&gt;Test Email&lt;/h1&gt;&lt;p&gt;This is a test email from the API.&lt;/p&gt;</textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Send Test Email</button>
+                                    </form>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Response</h5>
+                                    <pre id="testResponse" class="bg-light p-3 rounded" style="min-height: 200px;">Click "Send Test Email" to see the response here.</pre>
+                                </div>
+                            </div>
+                            
+                            <!-- Template Testing Section -->
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h5>Test Template Email</h5>
+                                    <form id="testTemplateForm">
+                                        {% csrf_token %}
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Template</label>
+                                                    <select class="form-select" id="templateSelect" required>
+                                                        <option value="">Loading templates...</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">To Email</label>
+                                                    <input type="email" class="form-control" name="to" value="{{ user.email }}" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Variables (JSON)</label>
+                                                    <textarea class="form-control" id="templateVariables" rows="4" placeholder='{"user_name": "John Doe", "app_name": "MyApp"}'></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-success">Send Template Email</button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Load API keys and templates on page load
+{% if user.is_authenticated %}
+document.addEventListener('DOMContentLoaded', function() {
+    loadApiKeys();
+    loadTemplates();
+});
+
+function loadApiKeys() {
+    fetch('/api/v1/api-keys/', {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        const select = document.getElementById('apiKeySelect');
+        select.innerHTML = '<option value="">Select an API key...</option>';
+        
+        if (data.api_keys && data.api_keys.length > 0) {
+            data.api_keys.forEach(key => {
+                const option = document.createElement('option');
+                option.value = key.key;
+                option.textContent = `${key.name} (${key.key.substring(0, 8)}...)`;
+                select.appendChild(option);
+            });
+            // Auto-select first key
+            select.selectedIndex = 1;
+        } else {
+            select.innerHTML = '<option value="">No API keys found</option>';
+        }
+    })
+    .catch(error => {
+        console.error('Error loading API keys:', error);
+        document.getElementById('apiKeySelect').innerHTML = '<option value="">Error loading API keys</option>';
+    });
+}
+
+function loadTemplates() {
+    fetch('/api/v1/templates/', {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        const select = document.getElementById('templateSelect');
+        select.innerHTML = '<option value="">Select a template...</option>';
+        
+        if (data.templates && data.templates.length > 0) {
+            data.templates.forEach(template => {
+                const option = document.createElement('option');
+                option.value = template.name;
+                option.textContent = `${template.name} - ${template.description}`;
+                select.appendChild(option);
+            });
+        } else {
+            select.innerHTML = '<option value="">No templates found</option>';
+        }
+    })
+    .catch(error => {
+        console.error('Error loading templates:', error);
+        document.getElementById('templateSelect').innerHTML = '<option value="">Error loading templates</option>';
+    });
+}
+
+// Test email form submission
+document.getElementById('testSendForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData);
+    const apiKey = document.getElementById('apiKeySelect').value;
+    
+    if (!apiKey) {
+        alert('Please select an API key');
+        return;
+    }
+    
+    fetch('/api/v1/send/', {
+        method: 'POST',
+        headers: {
+            'X-API-Key': apiKey,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('testResponse').textContent = JSON.stringify(data, null, 2);
+    })
+    .catch(error => {
+        document.getElementById('testResponse').textContent = 'Error: ' + error;
+    });
+});
+
+// Test template form submission
+document.getElementById('testTemplateForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const template = document.getElementById('templateSelect').value;
+    const to = this.querySelector('input[name="to"]').value;
+    const variablesText = document.getElementById('templateVariables').value;
+    
+    if (!template) {
+        alert('Please select a template');
+        return;
+    }
+    
+    let variables = {};
+    if (variablesText.trim()) {
+        try {
+            variables = JSON.parse(variablesText);
+        } catch (e) {
+            alert('Invalid JSON in variables field');
+            return;
+        }
+    }
+    
+    const apiKey = document.getElementById('apiKeySelect').value;
+    if (!apiKey) {
+        alert('Please select an API key');
+        return;
+    }
+    
+    const data = {
+        template: template,
+        to: to,
+        variables: variables
+    };
+    
+    fetch('/api/v1/send-template/', {
+        method: 'POST',
+        headers: {
+            'X-API-Key': apiKey,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('testResponse').textContent = JSON.stringify(data, null, 2);
+    })
+    .catch(error => {
+        document.getElementById('testResponse').textContent = 'Error: ' + error;
+    });
+});
+{% endif %}
+</script>
+{% endblock %}

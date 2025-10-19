@@ -1,0 +1,25 @@
+Email Quota Reset - {{ site_name }}
+
+Hello {{ user.first_name|default:user.email }},
+
+✅ QUOTA RESET COMPLETE
+Great news! Your email quota has been reset for the new billing period.
+
+YOUR NEW QUOTA:
+- Plan: {{ plan_name }}
+- Monthly email limit: {{ quota_limit }} emails
+- Status: Ready to send
+
+You can now continue sending emails with your full quota available. Make the most of your email campaigns!
+
+VIEW YOUR DASHBOARD:
+https://mailcurrent.io/dashboard
+
+If you need more email capacity or have any questions, feel free to contact our support team.
+
+Best regards,
+The {{ site_name }} Team
+
+---
+This notification was sent to {{ user.email }}
+© {{ current_year }} {{ site_name }}. All rights reserved.

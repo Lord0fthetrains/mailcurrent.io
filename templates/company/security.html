@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block title %}Security - MailCurrent.io{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="display-4 fw-bold mb-4">Security</h1>
+            <p class="lead text-muted mb-5">Your data security is our top priority. Learn about our comprehensive security measures and practices.</p>
+            
+            <!-- Security Overview -->
+            <div class="card mb-5">
+                <div class="card-body">
+                    <h2 class="h3 mb-4">Security Overview</h2>
+                    <p class="mb-4">At MailCurrent.io, we implement multiple layers of security to protect your data and ensure the integrity of our email delivery service. Our security measures are designed to meet enterprise standards and comply with industry best practices.</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                        <i class="bi bi-shield-check text-white"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5 class="mb-2">Data Encryption</h5>
+                                    <p class="text-muted">All data is encrypted in transit and at rest using industry-standard encryption protocols.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-success bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                        <i class="bi bi-lock text-white"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5 class="mb-2">Access Controls</h5>
+                                    <p class="text-muted">Multi-factor authentication and role-based access controls protect all systems.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Data Protection -->
+            <div class="card mb-5">
+                <div class="card-body">
+                    <h2 class="h3 mb-4">Data Protection</h2>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Encryption in Transit</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>TLS 1.3 for all API communications</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>HTTPS for all web traffic</li>
+                                <li class="bi bi-check-circle text-success me-2"></i>SMTP over TLS for email delivery</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Encryption at Rest</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>AES-256 encryption for stored data</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Encrypted database backups</li>
+                                <li class="bi bi-check-circle text-success me-2"></i>Secure key management</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Infrastructure Security -->
+            <div class="card mb-5">
+                <div class="card-body">
+                    <h2 class="h3 mb-4">Infrastructure Security</h2>
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <h5 class="text-success">Network Security</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Firewall protection</li>
+                                <li class="mb-2"><i class="bi bi-check text-success me-2"></i>DDoS mitigation</li>
+                                <li class="bi bi-check text-success me-2"></i>Intrusion detection</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <h5 class="text-warning">Server Security</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Regular security updates</li>
+                                <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Hardened configurations</li>
+                                <li class="bi bi-check text-success me-2"></i>Vulnerability scanning</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <h5 class="text-info">Monitoring</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check text-success me-2"></i>24/7 security monitoring</li>
+                                <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Automated threat detection</li>
+                                <li class="bi bi-check text-success me-2"></i>Incident response procedures</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Authentication & Access -->
+            <div class="card mb-5">
+                <div class="card-body">
+                    <h2 class="h3 mb-4">Authentication & Access Control</h2>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">API Security</h5>
+                            <ul>
+                                <li>API key authentication with rate limiting</li>
+                                <li>JWT tokens for session management</li>
+                                <li>IP whitelisting capabilities</li>
+                                <li>Request signing for webhooks</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">User Access</h5>
+                            <ul>
+                                <li>Multi-factor authentication (MFA)</li>
+                                <li>Strong password requirements</li>
+                                <li>Session timeout and management</li>
+                                <li>Role-based permissions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Compliance -->
+            <div class="card mb-5">
+                <div class="card-body">
+                    <h2 class="h3 mb-4">Compliance & Certifications</h2>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-success">Data Protection</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-shield-check text-success me-2"></i>GDPR compliant</li>
+                                <li class="mb-2"><i class="bi bi-shield-check text-success me-2"></i>CCPA compliant</li>
+                                <li class="bi bi-shield-check text-success me-2"></i>SOC 2 Type II (in progress)</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-info">Email Standards</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-envelope-check text-success me-2"></i>SPF, DKIM, DMARC support</li>
+                                <li class="mb-2"><i class="bi bi-envelope-check text-success me-2"></i>CAN-SPAM Act compliant</li>
+                                <li class="bi bi-envelope-check text-success me-2"></i>Anti-spam best practices</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Security Features -->
+            <div class="card mb-5">
+                <div class="card-body">
+                    <h2 class="h3 mb-4">Security Features</h2>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-warning">Email Security</h5>
+                            <ul>
+                                <li>Content scanning and filtering</li>
+                                <li>Attachment security scanning</li>
+                                <li>Link validation and safety checks</li>
+                                <li>Spam score analysis</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-danger">Threat Protection</h5>
+                            <ul>
+                                <li>Real-time threat detection</li>
+                                <li>Automated abuse prevention</li>
+                                <li>Blacklist monitoring</li>
+                                <li>Anomaly detection</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Incident Response -->
+            <div class="card mb-5">
+                <div class="card-body">
+                    <h2 class="h3 mb-4">Incident Response</h2>
+                    <p class="mb-4">We have a comprehensive incident response plan to quickly address any security issues:</p>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5 class="text-primary">Detection</h5>
+                            <p class="text-muted">Automated monitoring and alerting systems detect potential security incidents in real-time.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="text-warning">Response</h5>
+                            <p class="text-muted">Our security team responds immediately to contain and mitigate any threats.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="text-success">Recovery</h5>
+                            <p class="text-muted">We work quickly to restore normal operations and prevent future incidents.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reporting Security Issues -->
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="h3 mb-4">Reporting Security Issues</h2>
+                    <p class="mb-4">If you discover a security vulnerability in our service, please report it responsibly:</p>
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading">Security Contact</h5>
+                        <p class="mb-2"><strong>Email:</strong> security@mailcurrent.io</p>
+                        <p class="mb-0">Please include detailed information about the vulnerability and steps to reproduce it. We appreciate responsible disclosure and will work with you to address any issues promptly.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

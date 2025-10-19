@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Email Verification - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <img src="{% static 'images/logos/MailLogo_trim.png' %}" alt="MailCurrent.io" class="img-fluid" style="max-height: 60px;">
+                    </div>
+                    {% if success %}
+                        <div class="text-success mb-4">
+                            <i class="bi bi-check-circle-fill" style="font-size: 4rem;"></i>
+                        </div>
+                        <h2 class="text-success mb-3">Email Verified Successfully!</h2>
+                        <p class="text-muted mb-4">{{ message }}</p>
+                        <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-speedometer2 me-2"></i>Go to Dashboard
+                        </a>
+                    {% else %}
+                        <div class="text-danger mb-4">
+                            <i class="bi bi-x-circle-fill" style="font-size: 4rem;"></i>
+                        </div>
+                        <h2 class="text-danger mb-3">Verification Failed</h2>
+                        <p class="text-muted mb-4">{{ message }}</p>
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Go to Login
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

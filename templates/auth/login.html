@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In - MailCurrent.io{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-control.is-valid {
+    border-color: #198754;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='m2.3 6.73.94-.94 1.06 1.06L6.73 4.3l.94.94L4.3 8.73z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 4.6 1.4 1.4m0-1.4-1.4 1.4'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+.valid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #198754;
+}
+
+#form-error {
+    margin-bottom: 1rem;
+}
+
+.btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.input-group .btn {
+    border-left: 0;
+}
+
+.input-group .form-control:focus + .btn {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.input-group .form-control.is-valid + .btn {
+    border-color: #198754;
+}
+
+.input-group .form-control.is-invalid + .btn {
+    border-color: #dc3545;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold">Welcome Back</h2>
+                        <p class="text-muted">Sign in to your account</p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                            <div class="invalid-feedback" id="email-error"></div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="bi bi-eye" id="passwordToggleIcon"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback" id="password-error"></div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 btn-lg">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                        </button>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <p class="text-muted">
+                            Don't have an account? 
+                            <a href="{% url 'register' %}" class="text-decoration-none">Sign up</a>
+                        </p>
+                    </div>
+                    
+                    <div class="text-center mt-3">
+                        <a href="{% url 'forgot_password' %}" class="text-decoration-none small">Forgot your password?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const submitButton = document.querySelector('button[type="submit"]');
+    const togglePasswordBtn = document.getElementById('togglePassword');
+
+    // Email validation
+    emailInput.addEventListener('blur', function() {
+        validateEmail();
+    });
+
+    emailInput.addEventListener('input', function() {
+        clearError('email');
+    });
+
+    // Password validation
+    passwordInput.addEventListener('blur', function() {
+        validatePassword();
+    });
+
+    passwordInput.addEventListener('input', function() {
+        clearError('password');
+    });
+
+    // Password visibility toggle
+    togglePasswordBtn.addEventListener('click', function() {
+        togglePasswordVisibility('password', 'passwordToggleIcon');
+    });
+
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        let isValid = true;
+        
+        // Validate all fields
+        isValid &= validateEmail();
+        isValid &= validatePassword();
+        
+        if (isValid) {
+            // Show loading state
+            submitButton.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Signing In...';
+            submitButton.disabled = true;
+            
+            // Submit the form
+            form.submit();
+        } else {
+            // Show error message
+            showFormError('Please correct the errors below and try again.');
+        }
+    });
+
+    function validateEmail() {
+        const email = emailInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (!email) {
+            showError('email', 'Email address is required');
+            return false;
+        } else if (!emailRegex.test(email)) {
+            showError('email', 'Please enter a valid email address');
+            return false;
+        } else {
+            clearError('email');
+            return true;
+        }
+    }
+
+    function validatePassword() {
+        const password = passwordInput.value;
+        
+        if (!password) {
+            showError('password', 'Password is required');
+            return false;
+        } else {
+            clearError('password');
+            return true;
+        }
+    }
+
+    function showError(fieldName, message) {
+        const input = document.getElementById(fieldName);
+        const errorDiv = document.getElementById(fieldName + '-error');
+        
+        input.classList.add('is-invalid');
+        input.classList.remove('is-valid');
+        errorDiv.textContent = message;
+    }
+
+    function clearError(fieldName) {
+        const input = document.getElementById(fieldName);
+        const errorDiv = document.getElementById(fieldName + '-error');
+        
+        input.classList.remove('is-invalid');
+        input.classList.add('is-valid');
+        errorDiv.textContent = '';
+    }
+
+    function showFormError(message) {
+        // Create or update form error alert
+        let alertDiv = document.getElementById('form-error');
+        if (!alertDiv) {
+            alertDiv = document.createElement('div');
+            alertDiv.id = 'form-error';
+            alertDiv.className = 'alert alert-danger';
+            form.insertBefore(alertDiv, form.firstChild);
+        }
+        alertDiv.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i>' + message;
+        alertDiv.style.display = 'block';
+        
+        // Scroll to top of form
+        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function togglePasswordVisibility(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'bi bi-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'bi bi-eye';
+        }
+    }
+});
+</script>
+{% endblock %}

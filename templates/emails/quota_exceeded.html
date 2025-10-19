@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Quota Exceeded - {{ site_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .logo {
+            height: 50px;
+            margin-bottom: 15px;
+        }
+        .content {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .error-box {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .stats {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #dc3545;
+        }
+        .button {
+            display: inline-block;
+            background: #dc3545;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background: #c82333;
+        }
+        .button-secondary {
+            background: #6c757d;
+        }
+        .button-secondary:hover {
+            background: #545b62;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            color: #6c757d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="https://mailcurrent.io/static/images/logos/MailLogo_trim.png" alt="{{ site_name }}" class="logo">
+        <h1>🚨 Email Quota Exceeded</h1>
+        <p>Your monthly email limit has been reached</p>
+    </div>
+    
+    <div class="content">
+        <h2>Hello {{ user.first_name|default:user.email }}!</h2>
+        
+        <div class="error-box">
+            <h3>🚨 Quota Exceeded</h3>
+            <p>You have <strong>exceeded</strong> your monthly email quota for {{ current_period }}.</p>
+            <p><strong>Action Required:</strong> Upgrade your plan to continue sending emails.</p>
+        </div>
+        
+        <div class="stats">
+            <h3>Current Usage</h3>
+            <ul>
+                <li><strong>Emails sent this period:</strong> {{ emails_sent }} / {{ quota_limit }}</li>
+                <li><strong>Overage:</strong> {{ overage_count }} emails</li>
+                <li><strong>Current plan:</strong> {{ plan_name }}</li>
+                <li><strong>Period resets:</strong> {{ reset_date }}</li>
+            </ul>
+        </div>
+        
+        <p><strong>What happens now?</strong></p>
+        <ul>
+            <li>New email sending requests will be temporarily paused</li>
+            <li>You can upgrade your plan to resume service immediately</li>
+            <li>Your quota will reset on {{ reset_date }}</li>
+            <li>No data or settings will be lost</li>
+        </ul>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="https://mailcurrent.io/pricing" class="button">Upgrade Now</a>
+            <a href="https://mailcurrent.io/dashboard" class="button button-secondary">View Dashboard</a>
+        </div>
+        
+        <p><strong>Need help?</strong> Our support team is here to help you choose the right plan for your needs. Contact us at <a href="mailto:support@mailcurrent.io">support@mailcurrent.io</a></p>
+        
+        <p>Best regards,<br><strong>The {{ site_name }} Team</strong></p>
+    </div>
+    
+    <div class="footer">
+        <p>This notification was sent to {{ user.email }}</p>
+        <p>© {{ current_year }} {{ site_name }}. All rights reserved.</p>
+    </div>
+</body>
+</html>

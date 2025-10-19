@@ -1,0 +1,677 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}API Documentation - MailCurrent.io{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-3">
+            <!-- Sidebar Navigation -->
+            <div class="sticky-top" style="top: 2rem;">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">API Documentation</h6>
+                        <ul class="nav nav-pills flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#getting-started">Getting Started</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#authentication">Authentication</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#send-email">Send Email</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#send-template">Send Template</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#templates">Templates</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#logs">Email Logs</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#errors">Error Handling</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-9">
+            <!-- Getting Started -->
+            <section id="getting-started" class="mb-5">
+                <h2 class="fw-bold mb-3">Getting Started</h2>
+                <p class="lead">Our Email API is designed to be simple and powerful. Send transactional emails with just a few lines of code.</p>
+                
+                <div class="alert alert-info">
+                    <h5><i class="bi bi-info-circle me-2"></i>Base URL</h5>
+                    <code>{{ request.scheme }}://{{ request.get_host }}/api/v1/</code>
+                </div>
+                
+                <h4>Quick Start</h4>
+                <ol>
+                    <li>Create an account and get your API key</li>
+                    <li>Make a request to our API endpoint</li>
+                    <li>Monitor your email delivery in the dashboard</li>
+                </ol>
+            </section>
+            
+            <!-- Authentication -->
+            <section id="authentication" class="mb-5">
+                <h2 class="fw-bold mb-3">Authentication</h2>
+                <p>All API requests require authentication using an API key. Include your API key in the request header.</p>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Header</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre><code>X-API-Key: your-api-key-here</code></pre>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <h6><i class="bi bi-exclamation-triangle me-2"></i>Security Note</h6>
+                    Keep your API key secure and never expose it in client-side code. Each API key has rate limits and usage tracking.
+                </div>
+                
+                <div class="alert alert-info">
+                    <h6><i class="bi bi-envelope-check me-2"></i>Email Verification Required</h6>
+                    Before you can send emails via the API, you must verify your email address. Unverified users will receive a <code>405 Method Not Allowed</code> error when attempting to send emails.
+                </div>
+            </section>
+            
+            <!-- Send Email -->
+            <section id="send-email" class="mb-5">
+                <h2 class="fw-bold mb-3">Send Custom Email</h2>
+                <p>Send emails with full HTML and text content customization.</p>
+                
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">POST /send/</h5>
+                        <span class="badge bg-primary">Custom Email</span>
+                    </div>
+                    <div class="card-body">
+                        <h6>Request Body</h6>
+                        <pre><code>{
+  "to": "user@example.com",
+  "subject": "Welcome to our service!",
+  "html": "&lt;h1&gt;Welcome!&lt;/h1&gt;&lt;p&gt;Thank you for joining us.&lt;/p&gt;",
+  "text": "Welcome! Thank you for joining us.",
+  "from_email": "noreply@yourdomain.com",
+  "from_name": "Your App",
+  "reply_to": "support@yourdomain.com",
+  "attachments": [
+    {
+      "filename": "document.pdf",
+      "content": "base64_encoded_content",
+      "mimetype": "application/pdf"
+    }
+  ]
+}</code></pre>
+                        
+                        <h6 class="mt-4">Example Request</h6>
+                        <pre><code>curl -X POST {{ request.scheme }}://{{ request.get_host }}/api/v1/send/ \
+  -H "X-API-Key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to": "user@example.com",
+    "subject": "Welcome!",
+    "html": "&lt;h1&gt;Hello World&lt;/h1&gt;",
+    "text": "Hello World"
+  }'</code></pre>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Send Template -->
+            <section id="send-template" class="mb-5">
+                <h2 class="fw-bold mb-3">Send Template Email</h2>
+                <p>Send emails using predefined templates with variable substitution.</p>
+                
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">POST /send-template/</h5>
+                        <span class="badge bg-success">Template Email</span>
+                    </div>
+                    <div class="card-body">
+                        <h6>Request Body</h6>
+                        <pre><code>{
+  "template": "welcome",
+  "to": "user@example.com",
+  "variables": {
+    "user_name": "John Doe",
+    "app_name": "MyApp",
+    "verification_link": "https://example.com/verify?token=abc123"
+  },
+  "from_email": "noreply@yourdomain.com",
+  "from_name": "Your App"
+}</code></pre>
+                        
+                        <h6 class="mt-4">Example Request</h6>
+                        <pre><code>curl -X POST {{ request.scheme }}://{{ request.get_host }}/api/v1/send-template/ \
+  -H "X-API-Key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "template": "welcome",
+    "to": "user@example.com",
+    "variables": {
+      "user_name": "John Doe"
+    }
+  }'</code></pre>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Templates -->
+            <section id="templates" class="mb-5">
+                <h2 class="fw-bold mb-3">Email Templates</h2>
+                <p>Pre-built email templates with variable substitution using Jinja2 templating engine.</p>
+                
+                <!-- API Endpoint -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">GET /templates/</h5>
+                        <span class="badge bg-info">List Templates</span>
+                    </div>
+                    <div class="card-body">
+                        <h6>Example Request</h6>
+                        <pre><code>curl -X GET {{ request.scheme }}://{{ request.get_host }}/api/v1/templates/ \
+  -H "X-API-Key: your-api-key"</code></pre>
+                        
+                        <h6 class="mt-4">Response</h6>
+                        <pre><code>{
+  "success": true,
+  "templates": [
+    {
+      "name": "welcome",
+      "subject": "Welcome to {{ app_name }}!",
+      "description": "Welcome email for new users",
+      "required_variables": ["user_name", "app_name"],
+      "is_active": true,
+      "created_at": "2025-10-18T04:07:05.267695Z"
+    }
+  ]
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- Template Details -->
+                <h3 class="fw-bold mb-4">Available Templates</h3>
+                
+                <!-- Welcome Template -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-envelope-heart me-2"></i>Welcome Template
+                            <span class="badge bg-success ms-2">Active</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Template Details</h6>
+                                <ul class="list-unstyled">
+                                    <li><strong>Name:</strong> <code>welcome</code></li>
+                                    <li><strong>Subject:</strong> <code>Welcome to {{ app_name }}!</code></li>
+                                    <li><strong>Description:</strong> Welcome email for new users</li>
+                                    <li><strong>Required Variables:</strong> <code>user_name</code>, <code>app_name</code></li>
+                                </ul>
+                                
+                                <h6 class="mt-3">Usage Example</h6>
+                                <pre><code>curl -X POST {{ request.scheme }}://{{ request.get_host }}/api/v1/send-template/ \
+  -H "X-API-Key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "template": "welcome",
+    "to": "user@example.com",
+    "variables": {
+      "user_name": "John Doe",
+      "app_name": "MyApp"
+    }
+  }'</code></pre>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Preview</h6>
+                                <div class="border rounded p-3 bg-light" style="max-height: 300px; overflow-y: auto;">
+                                    <div class="text-center mb-3">
+                                        <img src="{% static 'images/logos/MailLogo_trim.png' %}" alt="MailCurrent.io" style="height: 40px;">
+                                    </div>
+                                    <h4>Welcome to MyApp!</h4>
+                                    <p>Hello John Doe,</p>
+                                    <p>Welcome to MyApp! We're excited to have you on board.</p>
+                                    <p>Get started by exploring our features and customizing your experience.</p>
+                                    <div class="text-center mt-3">
+                                        <a href="#" class="btn btn-primary">Get Started</a>
+                                    </div>
+                                    <hr>
+                                    <p class="text-muted small">Best regards,<br>The MyApp Team</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verification Template -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-shield-check me-2"></i>Verification Template
+                            <span class="badge bg-success ms-2">Active</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Template Details</h6>
+                                <ul class="list-unstyled">
+                                    <li><strong>Name:</strong> <code>verification</code></li>
+                                    <li><strong>Subject:</strong> <code>Verify your email address</code></li>
+                                    <li><strong>Description:</strong> Email verification template</li>
+                                    <li><strong>Required Variables:</strong> <code>verification_link</code></li>
+                                </ul>
+                                
+                                <h6 class="mt-3">Usage Example</h6>
+                                <pre><code>curl -X POST {{ request.scheme }}://{{ request.get_host }}/api/v1/send-template/ \
+  -H "X-API-Key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "template": "verification",
+    "to": "user@example.com",
+    "variables": {
+      "verification_link": "https://myapp.com/verify?token=abc123"
+    }
+  }'</code></pre>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Preview</h6>
+                                <div class="border rounded p-3 bg-light" style="max-height: 300px; overflow-y: auto;">
+                                    <div class="text-center mb-3">
+                                        <img src="{% static 'images/logos/MailLogo_trim.png' %}" alt="MailCurrent.io" style="height: 40px;">
+                                    </div>
+                                    <h4>Verify Your Email Address</h4>
+                                    <p>Please click the button below to verify your email address and complete your registration.</p>
+                                    <div class="text-center mt-3">
+                                        <a href="https://myapp.com/verify?token=abc123" class="btn btn-primary">Verify Email</a>
+                                    </div>
+                                    <p class="text-muted small mt-3">If the button doesn't work, copy and paste this link into your browser:<br>
+                                    <code>https://myapp.com/verify?token=abc123</code></p>
+                                    <hr>
+                                    <p class="text-muted small">Best regards,<br>The MailCurrent.io Team</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Template Variables -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-code-square me-2"></i>Template Variables
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p>All templates support Jinja2 templating with the following common variables:</p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>System Variables</h6>
+                                <ul>
+                                    <li><code>{{ site_name }}</code> - Your site name (MailCurrent.io)</li>
+                                    <li><code>{{ current_date }}</code> - Current date</li>
+                                    <li><code>{{ current_time }}</code> - Current time</li>
+                                    <li><code>{{ current_year }}</code> - Current year</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Template-Specific Variables</h6>
+                                <ul>
+                                    <li><code>{{ user_name }}</code> - User's name</li>
+                                    <li><code>{{ app_name }}</code> - Your application name</li>
+                                    <li><code>{{ verification_link }}</code> - Email verification URL</li>
+                                    <li><code>{{ reset_link }}</code> - Password reset URL</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info mt-3">
+                            <h6><i class="bi bi-info-circle me-2"></i>Jinja2 Features</h6>
+                            <p class="mb-0">Templates support full Jinja2 syntax including conditionals, loops, and filters. Example: <code>{{ user_name|title }}</code> will capitalize the user's name.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Logs -->
+            <section id="logs" class="mb-5">
+                <h2 class="fw-bold mb-3">Email Logs</h2>
+                <p>View your email sending history and delivery status.</p>
+                
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">GET /logs/</h5>
+                        <span class="badge bg-secondary">View Logs</span>
+                    </div>
+                    <div class="card-body">
+                        <h6>Query Parameters</h6>
+                        <ul>
+                            <li><code>limit</code> - Number of logs to return (default: 50)</li>
+                            <li><code>offset</code> - Number of logs to skip (default: 0)</li>
+                            <li><code>status</code> - Filter by status (sent, failed, pending)</li>
+                        </ul>
+                        
+                        <h6 class="mt-4">Example Request</h6>
+                        <pre><code>curl -X GET "{{ request.scheme }}://{{ request.get_host }}/api/v1/logs/?limit=10&status=sent" \
+  -H "X-API-Key: your-api-key"</code></pre>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Error Handling -->
+            <section id="errors" class="mb-5">
+                <h2 class="fw-bold mb-3">Error Handling</h2>
+                <p>Our API uses standard HTTP status codes and returns detailed error messages.</p>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Status Code</th>
+                                <th>Description</th>
+                                <th>Example Response</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge bg-success">200</span></td>
+                                <td>Success</td>
+                                <td><code>{"success": true, "message": "Email sent successfully"}</code></td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-warning">400</span></td>
+                                <td>Bad Request</td>
+                                <td><code>{"error": "Invalid email address"}</code></td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-danger">401</span></td>
+                                <td>Unauthorized</td>
+                                <td><code>{"error": "Invalid or inactive API key"}</code></td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-warning">405</span></td>
+                                <td>Method Not Allowed</td>
+                                <td><code>{"error": "Email verification required. Please verify your email address before sending emails via API."}</code></td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-danger">429</span></td>
+                                <td>Rate Limited</td>
+                                <td><code>{"error": "Rate limit exceeded"}</code></td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-danger">500</span></td>
+                                <td>Server Error</td>
+                                <td><code>{"error": "Internal server error"}</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Interactive API Explorer -->
+            <section class="mb-5">
+                <h2 class="fw-bold mb-3">Interactive API Explorer</h2>
+                <p>Test our API endpoints directly from your browser.</p>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            You need to be logged in to use the interactive API explorer. 
+                            <a href="{% url 'login' %}" class="text-decoration-none">Sign in here</a>.
+                        </div>
+                        
+                        {% if user.is_authenticated %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Test Send Email</h5>
+                                <form id="testSendForm">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label class="form-label">API Key</label>
+                                        <select class="form-select" id="apiKeySelect" required>
+                                            <option value="">Loading API keys...</option>
+                                        </select>
+                                        <div class="form-text">
+                                            <a href="{% url 'profile' %}" target="_blank">Manage API keys</a>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">To Email</label>
+                                        <input type="email" class="form-control" name="to" value="{{ user.email }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Subject</label>
+                                        <input type="text" class="form-control" name="subject" value="Test Email" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Message</label>
+                                        <textarea class="form-control" name="html" rows="3" required>&lt;h1&gt;Test Email&lt;/h1&gt;&lt;p&gt;This is a test email from the API.&lt;/p&gt;</textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Send Test Email</button>
+                                </form>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Response</h5>
+                                <pre id="testResponse" class="bg-light p-3 rounded" style="min-height: 200px;">Click "Send Test Email" to see the response here.</pre>
+                            </div>
+                        </div>
+                        
+                        <!-- Template Testing Section -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h5>Test Template Email</h5>
+                                <form id="testTemplateForm">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Template</label>
+                                                <select class="form-select" id="templateSelect" required>
+                                                    <option value="">Loading templates...</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">To Email</label>
+                                                <input type="email" class="form-control" name="to" value="{{ user.email }}" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Variables (JSON)</label>
+                                                <textarea class="form-control" id="templateVariables" rows="4" placeholder='{"user_name": "John Doe", "app_name": "MyApp"}'></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-success">Send Template Email</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Smooth scrolling for navigation links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// Load API keys and templates on page load
+{% if user.is_authenticated %}
+document.addEventListener('DOMContentLoaded', function() {
+    loadApiKeys();
+    loadTemplates();
+});
+
+function loadApiKeys() {
+    fetch('/api/v1/api-keys/', {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        const select = document.getElementById('apiKeySelect');
+        select.innerHTML = '<option value="">Select an API key...</option>';
+        
+        if (data.api_keys && data.api_keys.length > 0) {
+            data.api_keys.forEach(key => {
+                const option = document.createElement('option');
+                option.value = key.key;
+                option.textContent = `${key.name} (${key.key.substring(0, 8)}...)`;
+                select.appendChild(option);
+            });
+            // Auto-select first key
+            select.selectedIndex = 1;
+        } else {
+            select.innerHTML = '<option value="">No API keys found</option>';
+        }
+    })
+    .catch(error => {
+        console.error('Error loading API keys:', error);
+        document.getElementById('apiKeySelect').innerHTML = '<option value="">Error loading API keys</option>';
+    });
+}
+
+function loadTemplates() {
+    fetch('/api/v1/templates/', {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        const select = document.getElementById('templateSelect');
+        select.innerHTML = '<option value="">Select a template...</option>';
+        
+        if (data.templates && data.templates.length > 0) {
+            data.templates.forEach(template => {
+                const option = document.createElement('option');
+                option.value = template.name;
+                option.textContent = `${template.name} - ${template.description}`;
+                select.appendChild(option);
+            });
+        } else {
+            select.innerHTML = '<option value="">No templates found</option>';
+        }
+    })
+    .catch(error => {
+        console.error('Error loading templates:', error);
+        document.getElementById('templateSelect').innerHTML = '<option value="">Error loading templates</option>';
+    });
+}
+
+// Test email form submission
+document.getElementById('testSendForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData);
+    const apiKey = document.getElementById('apiKeySelect').value;
+    
+    if (!apiKey) {
+        alert('Please select an API key');
+        return;
+    }
+    
+    fetch('/api/v1/send/', {
+        method: 'POST',
+        headers: {
+            'X-API-Key': apiKey,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('testResponse').textContent = JSON.stringify(data, null, 2);
+    })
+    .catch(error => {
+        document.getElementById('testResponse').textContent = 'Error: ' + error;
+    });
+});
+
+// Test template form submission
+document.getElementById('testTemplateForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const template = document.getElementById('templateSelect').value;
+    const to = this.querySelector('input[name="to"]').value;
+    const variablesText = document.getElementById('templateVariables').value;
+    
+    if (!template) {
+        alert('Please select a template');
+        return;
+    }
+    
+    let variables = {};
+    if (variablesText.trim()) {
+        try {
+            variables = JSON.parse(variablesText);
+        } catch (e) {
+            alert('Invalid JSON in variables field');
+            return;
+        }
+    }
+    
+    const apiKey = document.getElementById('apiKeySelect').value;
+    if (!apiKey) {
+        alert('Please select an API key');
+        return;
+    }
+    
+    const data = {
+        template: template,
+        to: to,
+        variables: variables
+    };
+    
+    fetch('/api/v1/send-template/', {
+        method: 'POST',
+        headers: {
+            'X-API-Key': apiKey,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('testResponse').textContent = JSON.stringify(data, null, 2);
+    })
+    .catch(error => {
+        document.getElementById('testResponse').textContent = 'Error: ' + error;
+    });
+});
+{% endif %}
+</script>
+{% endblock %}

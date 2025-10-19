@@ -1,0 +1,32 @@
+Email Quota Warning - {{ site_name }}
+
+Hello {{ user.first_name|default:user.email }},
+
+⚠️ QUOTA WARNING
+You've used {{ usage_percentage }}% of your monthly email quota for {{ current_period }}.
+
+CURRENT USAGE:
+- Emails sent this period: {{ emails_sent }} / {{ quota_limit }}
+- Remaining emails: {{ emails_remaining }}
+- Current plan: {{ plan_name }}
+- Period resets: {{ reset_date }}
+
+To avoid service interruption, we recommend:
+- Upgrading to a higher plan with more email capacity
+- Monitoring your email usage more closely
+- Optimizing your email campaigns for better deliverability
+
+UPGRADE YOUR PLAN:
+https://mailcurrent.io/pricing
+
+VIEW YOUR DASHBOARD:
+https://mailcurrent.io/dashboard
+
+If you have any questions about your usage or need help choosing the right plan, please don't hesitate to contact our support team.
+
+Best regards,
+The {{ site_name }} Team
+
+---
+This notification was sent to {{ user.email }}
+© {{ current_year }} {{ site_name }}. All rights reserved.

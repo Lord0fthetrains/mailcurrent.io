@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification - {{ app_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #28a745;
+            margin: 0;
+            font-size: 28px;
+        }
+        .content {
+            margin-bottom: 30px;
+        }
+        .verification-message {
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .cta-button {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .cta-button:hover {
+            background: #218838;
+        }
+        .verification-code {
+            background: #f8f9fa;
+            border: 2px solid #28a745;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+            letter-spacing: 3px;
+        }
+        .footer {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .expiry-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✅ Email Verification</h1>
+        </div>
+        
+        <div class="content">
+            <p class="verification-message">
+                Hello {{ user_name }},
+            </p>
+            
+            <p>
+                Thank you for signing up with {{ app_name }}! To complete your registration and secure your account, 
+                please verify your email address.
+            </p>
+            
+            {% if verification_code %}
+            <p>
+                Your verification code is:
+            </p>
+            <div class="verification-code">
+                {{ verification_code }}
+            </div>
+            <p style="text-align: center;">
+                Enter this code in the verification form to activate your account.
+            </p>
+            {% endif %}
+            
+            {% if verification_link %}
+            <p>
+                Click the button below to verify your email address:
+            </p>
+            <div style="text-align: center;">
+                <a href="{{ verification_link }}" class="cta-button">Verify Email Address</a>
+            </div>
+            {% endif %}
+            
+            {% if expiry_time %}
+            <div class="expiry-info">
+                <strong>⏰ Important:</strong> This verification link will expire in {{ expiry_time }}.
+                If you don't verify your email within this time, you'll need to request a new verification email.
+            </div>
+            {% endif %}
+            
+            <div class="warning">
+                <strong>⚠️ Security Notice:</strong> 
+                If you didn't create an account with {{ app_name }}, please ignore this email. 
+                Your email address will not be verified and no account will be created.
+            </div>
+            
+            <p>
+                If you're having trouble with the verification process, please contact our support team.
+            </p>
+            
+            <p>
+                Best regards,<br>
+                The {{ app_name }} Team
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>
+                This verification email was sent to {{ user_email }}.
+            </p>
+            <p>
+                © {{ current_year }} {{ app_name }}. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

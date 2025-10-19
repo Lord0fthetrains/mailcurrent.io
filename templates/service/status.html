@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+
+{% block title %}System Status - MailCurrent.io{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="display-4 fw-bold mb-4">System Status</h1>
+            <p class="lead text-muted mb-5">Real-time status of MailCurrent.io services and infrastructure.</p>
+            
+            <!-- Overall Status -->
+            <div class="card mb-5">
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        {% if status_data.overall_status == 'operational' %}
+                            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                        {% elif status_data.overall_status == 'degraded' %}
+                            <i class="bi bi-exclamation-triangle-fill text-warning" style="font-size: 4rem;"></i>
+                        {% elif status_data.overall_status == 'maintenance' %}
+                            <i class="bi bi-tools text-info" style="font-size: 4rem;"></i>
+                        {% else %}
+                            <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+                        {% endif %}
+                    </div>
+                    <h2 class="h3 {% if status_data.overall_status == 'operational' %}text-success{% elif status_data.overall_status == 'degraded' %}text-warning{% elif status_data.overall_status == 'maintenance' %}text-info{% else %}text-danger{% endif %} mb-3">
+                        {% if status_data.overall_status == 'operational' %}All Systems Operational
+                        {% elif status_data.overall_status == 'degraded' %}Degraded Performance
+                        {% elif status_data.overall_status == 'maintenance' %}Scheduled Maintenance
+                        {% else %}Service Disruption{% endif %}
+                    </h2>
+                    <p class="text-muted mb-0">Last updated: {{ status_data.last_updated|date:"F d, Y \a\t g:i A T" }}</p>
+                </div>
+            </div>
+            
+            <!-- Service Status Grid -->
+            <div class="row mb-5">
+                {% for component in status_data.components %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                {% if component.status == 'operational' %}
+                                    <i class="bi bi-check-circle-fill text-success me-3" style="font-size: 2rem;"></i>
+                                {% elif component.status == 'degraded' %}
+                                    <i class="bi bi-exclamation-triangle-fill text-warning me-3" style="font-size: 2rem;"></i>
+                                {% elif component.status == 'maintenance' %}
+                                    <i class="bi bi-tools text-info me-3" style="font-size: 2rem;"></i>
+                                {% else %}
+                                    <i class="bi bi-x-circle-fill text-danger me-3" style="font-size: 2rem;"></i>
+                                {% endif %}
+                                <div>
+                                    <h5 class="mb-1">{{ component.name }}</h5>
+                                    <span class="badge {% if component.status == 'operational' %}bg-success{% elif component.status == 'degraded' %}bg-warning{% elif component.status == 'maintenance' %}bg-info{% else %}bg-danger{% endif %}">
+                                        {{ component.status|title }}
+                                    </span>
+                                </div>
+                            </div>
+                            <p class="text-muted mb-2">{{ component.description }}</p>
+                            {% if component.response_time %}
+                                <small class="text-muted">Response Time: {{ component.response_time }}ms</small>
+                            {% endif %}
+                            {% if component.message %}
+                                <div class="mt-2">
+                                    <small class="text-muted">{{ component.message }}</small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        No system components configured yet. Please contact support.
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Performance Metrics -->
+            <div class="card mb-5">
+                <div class="card-body">
+                    <h3 class="h4 mb-4">Performance Metrics</h3>
+                    <div class="row">
+                        <div class="col-md-3 mb-4">
+                            <div class="text-center">
+                                <div class="h2 text-success mb-1">{{ metrics_data.uptime_30_days|floatformat:1 }}%</div>
+                                <div class="text-muted">Uptime (30 days)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="text-center">
+                                <div class="h2 text-info mb-1">{{ metrics_data.avg_response_time }}ms</div>
+                                <div class="text-muted">Avg Response Time</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="text-center">
+                                <div class="h2 text-warning mb-1">{{ metrics_data.emails_sent_today }}</div>
+                                <div class="text-muted">Emails Sent Today</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="text-center">
+                                <div class="h2 text-primary mb-1">{{ metrics_data.api_requests_today }}</div>
+                                <div class="text-muted">API Requests Today</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Incidents -->
+            <div class="card mb-5">
+                <div class="card-body">
+                    <h3 class="h4 mb-4">Recent Incidents</h3>
+                    {% if status_data.incidents %}
+                        <div class="timeline">
+                            {% for incident in status_data.incidents %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker {% if incident.is_resolved %}bg-success{% elif incident.impact == 'critical' %}bg-danger{% elif incident.impact == 'major' %}bg-warning{% else %}bg-info{% endif %}"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">{{ incident.title }}</h6>
+                                    <p class="text-muted mb-1">{{ incident.description }}</p>
+                                    <small class="text-muted">
+                                        {% if incident.is_resolved %}
+                                            Resolved {{ incident.resolved_at|date:"M d, Y \a\t g:i A T" }}
+                                        {% else %}
+                                            {{ incident.status|title }} - {{ incident.started_at|date:"M d, Y \a\t g:i A T" }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                            <h5 class="mt-3 text-muted">No Recent Incidents</h5>
+                            <p class="text-muted">All systems are running smoothly with no reported issues.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- System Components -->
+            <div class="card mb-5">
+                <div class="card-body">
+                    <h3 class="h4 mb-4">System Components</h3>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Component</th>
+                                    <th>Status</th>
+                                    <th>Response Time</th>
+                                    <th>Last Check</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-server text-primary me-2"></i>
+                                            API Server
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-success">Operational</span></td>
+                                    <td>42ms</td>
+                                    <td>{{ "now"|date:"H:i:s" }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-database text-info me-2"></i>
+                                            Database
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-success">Operational</span></td>
+                                    <td>8ms</td>
+                                    <td>{{ "now"|date:"H:i:s" }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-envelope text-success me-2"></i>
+                                            SMTP Gateway
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-success">Operational</span></td>
+                                    <td>156ms</td>
+                                    <td>{{ "now"|date:"H:i:s" }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-graph-up text-warning me-2"></i>
+                                            Analytics Engine
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-success">Operational</span></td>
+                                    <td>23ms</td>
+                                    <td>{{ "now"|date:"H:i:s" }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-webhook text-danger me-2"></i>
+                                            Webhook Service
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-success">Operational</span></td>
+                                    <td>67ms</td>
+                                    <td>{{ "now"|date:"H:i:s" }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Monitoring & Alerts -->
+            <div class="card mb-5">
+                <div class="card-body">
+                    <h3 class="h4 mb-4">Monitoring & Alerts</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">24/7 Monitoring</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Uptime monitoring</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Performance tracking</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Error rate monitoring</li>
+                                <li class="bi bi-check-circle text-success me-2"></i>Resource utilization</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Alert Channels</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-envelope text-info me-2"></i>Email notifications</li>
+                                <li class="mb-2"><i class="bi bi-phone text-info me-2"></i>SMS alerts</li>
+                                <li class="mb-2"><i class="bi bi-slack text-info me-2"></i>Slack integration</li>
+                                <li class="bi bi-bell text-info me-2"></i>Webhook notifications</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Information -->
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="h4 mb-4">Status Updates</h3>
+                    <p class="mb-4">Stay informed about service status and incidents:</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Subscribe to Updates</h5>
+                            <p class="text-muted">Get notified about service incidents and maintenance windows.</p>
+                            <div class="input-group mb-3">
+                                <input type="email" class="form-control" placeholder="Enter your email">
+                                <button class="btn btn-primary" type="button">Subscribe</button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">RSS Feed</h5>
+                            <p class="text-muted">Subscribe to our status RSS feed for real-time updates.</p>
+                            <a href="#" class="btn btn-outline-primary">
+                                <i class="bi bi-rss me-2"></i>RSS Feed
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <h5 class="text-muted mb-3">Need Help?</h5>
+                        <a href="mailto:support@mailcurrent.io" class="btn btn-outline-primary me-3">
+                            <i class="bi bi-envelope me-2"></i>Contact Support
+                        </a>
+                        <a href="{% url 'api_docs' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-book me-2"></i>API Documentation
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e9ecef;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -22px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #e9ecef;
+}
+
+.timeline-content {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 3px solid #007bff;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MailCurrent.io - Powerful Email Delivery API{% endblock %}
+
+{% block description %}Powerful email API for developers. Send transactional emails with templates, tracking, and user management. 14-day free trial, no credit card required. RESTful API with comprehensive documentation.{% endblock %}
+
+{% block og_title %}MailCurrent.io - Powerful Email API for Developers{% endblock %}
+{% block og_description %}Send transactional emails with templates, tracking, and user management. 14-day free trial, no credit card required. RESTful API with comprehensive documentation.{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-gradient text-white py-5">
+    <div class="container">
+        <div class="row align-items-center min-vh-50">
+            <div class="col-lg-6">
+                
+                <h1 class="display-4 fw-bold mb-4">
+                    Powerful Email API for Developers
+                </h1>
+                <p class="lead mb-4">
+                    Send transactional emails with templates, tracking, and user management. 
+                    Built for developers who need reliable email delivery.
+                </p>
+                <div class="d-flex flex-column flex-sm-row gap-3">
+                    <a href="{% url 'register' %}" class="btn btn-light btn-lg">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Get Started Free
+                    </a>
+                    <a href="{% url 'api_docs' %}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-book me-2"></i>View API Docs
+                    </a>
+                </div>
+                <p class="mt-3 text-light">
+                    <i class="bi bi-check-circle me-2"></i>14-day free trial • No credit card required
+                </p>
+            </div>
+            <div class="col-lg-6">
+                <div class="bg-white rounded-3 p-3 p-md-4 shadow-lg">
+                    <h5 class="text-dark mb-3">Quick Start Example</h5>
+                    <div class="position-relative">
+                        <pre class="bg-dark p-3 rounded overflow-auto"><code class="text-light small">curl -X POST {{ request.scheme }}://{{ request.get_host }}/api/v1/send-template/ \
+  -H &quot;X-API-Key: your-api-key&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{
+    &quot;template&quot;: &quot;welcome&quot;,
+    &quot;to&quot;: &quot;user@example.com&quot;,
+    &quot;variables&quot;: {
+      &quot;user_name&quot;: &quot;John Doe&quot;
+    }
+  }&#x27;</code></pre>
+                        <button class="btn btn-sm btn-outline-light position-absolute top-0 end-0 m-2" onclick="copyCode()" title="Copy code">
+                            <i class="bi bi-copy"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-3">Everything You Need for Email</h2>
+                <p class="lead text-muted">
+                    From simple transactional emails to complex marketing campaigns, 
+                    our API handles it all with reliability and ease.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card feature-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-code-slash text-white fs-4"></i>
+                        </div>
+                        <h5 class="fw-bold">Developer Friendly</h5>
+                        <p class="text-muted">RESTful API with comprehensive documentation, SDKs, and examples for all major languages.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card feature-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-layout-text-window-reverse text-white fs-4"></i>
+                        </div>
+                        <h5 class="fw-bold">Template System</h5>
+                        <p class="text-muted">Create reusable email templates with variable substitution and full HTML customization support.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card feature-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-warning bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-graph-up text-white fs-4"></i>
+                        </div>
+                        <h5 class="fw-bold">Analytics & Tracking</h5>
+                        <p class="text-muted">Track email opens, clicks, and delivery status with detailed analytics and reporting.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card feature-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-info bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-shield-check text-white fs-4"></i>
+                        </div>
+                        <h5 class="fw-bold">Secure & Reliable</h5>
+                        <p class="text-muted">Enterprise-grade security with API key authentication, rate limiting, and 99.9% uptime SLA.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card feature-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-danger bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-people text-white fs-4"></i>
+                        </div>
+                        <h5 class="fw-bold">User Management</h5>
+                        <p class="text-muted">Complete user accounts with pricing tiers, usage tracking, and billing management.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card feature-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-secondary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-lightning text-white fs-4"></i>
+                        </div>
+                        <h5 class="fw-bold">High Performance</h5>
+                        <p class="text-muted">Lightning-fast email delivery with horizontal scaling and global infrastructure.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Preview -->
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-3">Simple, Transparent Pricing</h2>
+                <p class="lead text-muted">
+                    Choose the plan that fits your needs. All plans include our core features.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="card pricing-card h-100 border-0 shadow">
+                    <div class="card-body text-center p-4">
+                        <h5 class="fw-bold text-primary">Free Trial</h5>
+                        <div class="display-6 fw-bold mb-3">$0<span class="fs-6 text-muted">/month</span></div>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>1,000 emails/month</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>2 API keys</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>14-day trial</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Email templates</li>
+                        </ul>
+                        <a href="{% url 'register' %}" class="btn btn-outline-primary w-100">Start Free Trial</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card pricing-card h-100 border-primary shadow">
+                    <div class="card-header bg-primary text-white text-center">
+                        <span class="badge bg-light text-primary">Most Popular</span>
+                    </div>
+                    <div class="card-body text-center p-4">
+                        <h5 class="fw-bold text-primary">Professional</h5>
+                        <div class="display-6 fw-bold mb-3">$29.99<span class="fs-6 text-muted">/month</span></div>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>50,000 emails/month</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>15 API keys</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Custom templates</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Webhooks & Analytics</li>
+                        </ul>
+                        <a href="{% url 'register' %}" class="btn btn-primary w-100">Get Started</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card pricing-card h-100 border-0 shadow">
+                    <div class="card-body text-center p-4">
+                        <h5 class="fw-bold text-primary">Enterprise</h5>
+                        <div class="display-6 fw-bold mb-3">$99.99<span class="fs-6 text-muted">/month</span></div>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>200,000 emails/month</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>50 API keys</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Priority support</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>All features</li>
+                        </ul>
+                        <a href="{% url 'register' %}" class="btn btn-outline-primary w-100">Contact Sales</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'pricing' %}" class="btn btn-link">View all pricing plans <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+</section>
+
+<!-- Social Proof Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+
+        </div>
+        
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="display-4 fw-bold text-primary mb-2">10,000+</div>
+                    <p class="text-muted">Active Developers</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="display-4 fw-bold text-success mb-2">99.9%</div>
+                    <p class="text-muted">Uptime SLA</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="display-4 fw-bold text-warning mb-2">1M+</div>
+                    <p class="text-muted">Emails Delivered</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="text-center mb-5">Frequently Asked Questions</h2>
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq1">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1-content" aria-expanded="false" aria-controls="faq1-content">
+                                What happens if I exceed my monthly email limit?
+                            </button>
+                        </h2>
+                        <div id="faq1-content" class="accordion-collapse collapse" aria-labelledby="faq1" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                If you exceed your monthly limit, we'll notify you and you can upgrade your plan or purchase additional emails. We won't cut off your service immediately to ensure continuity.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2-content" aria-expanded="false" aria-controls="faq2-content">
+                                Do you support email attachments?
+                            </button>
+                        </h2>
+                        <div id="faq2-content" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes! You can attach files to your emails using our API. Attachments are securely processed and tracked in your email logs.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3-content" aria-expanded="false" aria-controls="faq3-content">
+                                Can I track email opens and clicks?
+                            </button>
+                        </h2>
+                        <div id="faq3-content" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Absolutely! We provide comprehensive analytics including open tracking, click tracking, and detailed performance metrics through our analytics API.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3">Ready to Get Started?</h2>
+                <p class="lead text-muted mb-4">
+                    Join thousands of developers who trust our email API for their applications.
+                </p>
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                    <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Start Building Now
+                    </a>
+                    <a href="{% url 'api_docs' %}" class="btn btn-outline-secondary btn-lg">
+                        <i class="bi bi-book me-2"></i>Read Documentation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function copyCode() {
+    const codeElement = document.querySelector('pre code');
+    const text = codeElement.textContent;
+    
+    navigator.clipboard.writeText(text).then(() => {
+        // Show success feedback
+        const button = event.target.closest('button');
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '<i class="bi bi-check"></i>';
+        button.classList.remove('btn-outline-light');
+        button.classList.add('btn-success');
+        
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.classList.remove('btn-success');
+            button.classList.add('btn-outline-light');
+        }, 2000);
+    }).catch(() => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        // Show success feedback
+        const button = event.target.closest('button');
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '<i class="bi bi-check"></i>';
+        button.classList.remove('btn-outline-light');
+        button.classList.add('btn-success');
+        
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.classList.remove('btn-success');
+            button.classList.add('btn-outline-light');
+        }, 2000);
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block title %}Blog - MailCurrent.io{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="display-4 fw-bold mb-4">Blog</h1>
+            <p class="lead text-muted mb-5">Insights, tutorials, and updates from the MailCurrent.io team.</p>
+            
+            <!-- Featured Post -->
+            <div class="card mb-5">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h2 class="h3 mb-3">Getting Started with Email APIs: A Complete Guide</h2>
+                            <p class="text-muted mb-3">Learn how to integrate email functionality into your applications using modern API-first approaches. This comprehensive guide covers everything from basic setup to advanced features.</p>
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="https://via.placeholder.com/40x40" alt="Author" class="rounded-circle me-3">
+                                <div>
+                                    <div class="fw-bold">Sarah Johnson</div>
+                                    <small class="text-muted">October 15, 2024 • 8 min read</small>
+                                </div>
+                            </div>
+                            <a href="#" class="btn btn-primary">Read More</a>
+                        </div>
+                        <div class="col-md-4">
+                            <img src="https://via.placeholder.com/300x200" alt="Featured Post" class="img-fluid rounded">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Blog Posts Grid -->
+            <div class="row mb-5">
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <img src="https://via.placeholder.com/400x200" alt="Blog Post" class="card-img-top">
+                        <div class="card-body">
+                            <h5 class="card-title">Email Deliverability Best Practices</h5>
+                            <p class="card-text text-muted">Discover the key factors that affect email deliverability and learn how to optimize your sending practices for better inbox placement.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">October 12, 2024</small>
+                                <a href="#" class="btn btn-outline-primary btn-sm">Read</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <img src="https://via.placeholder.com/400x200" alt="Blog Post" class="card-img-top">
+                        <div class="card-body">
+                            <h5 class="card-title">Building Scalable Email Infrastructure</h5>
+                            <p class="card-text text-muted">Learn how to design and implement email systems that can handle millions of messages while maintaining high deliverability rates.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">October 8, 2024</small>
+                                <a href="#" class="btn btn-outline-primary btn-sm">Read</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <img src="https://via.placeholder.com/400x200" alt="Blog Post" class="card-img-top">
+                        <div class="card-body">
+                            <h5 class="card-title">Transactional vs Marketing Emails</h5>
+                            <p class="card-text text-muted">Understanding the differences between transactional and marketing emails, and how to optimize each type for better results.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">October 5, 2024</small>
+                                <a href="#" class="btn btn-outline-primary btn-sm">Read</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <img src="https://via.placeholder.com/400x200" alt="Blog Post" class="card-img-top">
+                        <div class="card-body">
+                            <h5 class="card-title">Email Analytics: What to Track</h5>
+                            <p class="card-text text-muted">A comprehensive guide to email analytics metrics that matter most for your business success and email performance optimization.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">October 1, 2024</small>
+                                <a href="#" class="btn btn-outline-primary btn-sm">Read</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Categories -->
+            <div class="card mb-5">
+                <div class="card-body">
+                    <h3 class="h4 mb-4">Categories</h3>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center">
+                                <i class="bi bi-code-slash text-primary mb-2" style="font-size: 2rem;"></i>
+                                <h6>API Guides</h6>
+                                <small class="text-muted">Tutorials and guides for developers</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center">
+                                <i class="bi bi-graph-up text-success mb-2" style="font-size: 2rem;"></i>
+                                <h6>Analytics</h6>
+                                <small class="text-muted">Email metrics and insights</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center">
+                                <i class="bi bi-shield-check text-warning mb-2" style="font-size: 2rem;"></i>
+                                <h6>Security</h6>
+                                <small class="text-muted">Email security best practices</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center">
+                                <i class="bi bi-lightbulb text-info mb-2" style="font-size: 2rem;"></i>
+                                <h6>Tips & Tricks</h6>
+                                <small class="text-muted">Pro tips for better email delivery</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Newsletter Signup -->
+            <div class="card mb-5">
+                <div class="card-body text-center">
+                    <h3 class="h4 mb-3">Stay Updated</h3>
+                    <p class="text-muted mb-4">Get the latest blog posts, product updates, and email industry insights delivered to your inbox.</p>
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="email" class="form-control" placeholder="Enter your email address">
+                                <button class="btn btn-primary" type="button">Subscribe</button>
+                            </div>
+                            <small class="text-muted mt-2 d-block">No spam, unsubscribe at any time.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Popular Posts -->
+            <div class="card mb-5">
+                <div class="card-body">
+                    <h3 class="h4 mb-4">Popular Posts</h3>
+                    <div class="list-group list-group-flush">
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">10 Common Email API Mistakes to Avoid</h6>
+                                <small class="text-muted">2 days ago</small>
+                            </div>
+                            <p class="mb-1 text-muted">Learn about the most common pitfalls when implementing email APIs and how to avoid them.</p>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Email Template Design Best Practices</h6>
+                                <small class="text-muted">1 week ago</small>
+                            </div>
+                            <p class="mb-1 text-muted">Design email templates that look great across all devices and email clients.</p>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Understanding Email Bounce Rates</h6>
+                                <small class="text-muted">2 weeks ago</small>
+                            </div>
+                            <p class="mb-1 text-muted">A deep dive into email bounce rates and how to improve your delivery success.</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact for Guest Posts -->
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 class="h4 mb-3">Want to Write for Us?</h3>
+                    <p class="text-muted mb-4">We're always looking for great content about email technology, APIs, and developer tools. If you have an idea for a blog post, we'd love to hear from you.</p>
+                    <a href="mailto:blog@mailcurrent.io" class="btn btn-outline-primary">
+                        <i class="bi bi-envelope me-2"></i>Submit Your Idea
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

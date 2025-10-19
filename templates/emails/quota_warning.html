@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Quota Warning - {{ site_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .logo {
+            height: 50px;
+            margin-bottom: 15px;
+        }
+        .content {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .stats {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #ff9800;
+        }
+        .button {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .button-secondary {
+            background: #6c757d;
+        }
+        .button-secondary:hover {
+            background: #545b62;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            color: #6c757d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="https://mailcurrent.io/static/images/logos/MailLogo_trim.png" alt="{{ site_name }}" class="logo">
+        <h1>⚠️ Email Quota Warning</h1>
+        <p>You're approaching your monthly email limit</p>
+    </div>
+    
+    <div class="content">
+        <h2>Hello {{ user.first_name|default:user.email }}!</h2>
+        
+        <div class="warning-box">
+            <h3>⚠️ Quota Warning</h3>
+            <p>You've used <strong>{{ usage_percentage }}%</strong> of your monthly email quota for {{ current_period }}.</p>
+        </div>
+        
+        <div class="stats">
+            <h3>Current Usage</h3>
+            <ul>
+                <li><strong>Emails sent this period:</strong> {{ emails_sent }} / {{ quota_limit }}</li>
+                <li><strong>Remaining emails:</strong> {{ emails_remaining }}</li>
+                <li><strong>Current plan:</strong> {{ plan_name }}</li>
+                <li><strong>Period resets:</strong> {{ reset_date }}</li>
+            </ul>
+        </div>
+        
+        <p>To avoid service interruption, we recommend:</p>
+        <ul>
+            <li>Upgrading to a higher plan with more email capacity</li>
+            <li>Monitoring your email usage more closely</li>
+            <li>Optimizing your email campaigns for better deliverability</li>
+        </ul>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="https://mailcurrent.io/pricing" class="button">Upgrade Plan</a>
+            <a href="https://mailcurrent.io/dashboard" class="button button-secondary">View Dashboard</a>
+        </div>
+        
+        <p>If you have any questions about your usage or need help choosing the right plan, please don't hesitate to contact our support team.</p>
+        
+        <p>Best regards,<br><strong>The {{ site_name }} Team</strong></p>
+    </div>
+    
+    <div class="footer">
+        <p>This notification was sent to {{ user.email }}</p>
+        <p>© {{ current_year }} {{ site_name }}. All rights reserved.</p>
+    </div>
+</body>
+</html>

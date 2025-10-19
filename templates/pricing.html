@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+
+{% block title %}Pricing - MailCurrent.io{% endblock %}
+
+{% block content %}
+<!-- Pricing Header -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-lg-8 mx-auto">
+                <h1 class="display-4 fw-bold mb-3">Simple, Transparent Pricing</h1>
+                <p class="lead text-muted">
+                    Choose the plan that fits your needs. All plans include our core features with no hidden fees.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Cards -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            {% for plan in plans %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card pricing-card h-100 {% if plan.name == 'Professional' %}border-primary{% endif %}">
+                    {% if plan.name == 'Professional' %}
+                    <div class="card-header bg-primary text-white text-center">
+                        <span class="badge bg-light text-primary">Most Popular</span>
+                    </div>
+                    {% endif %}
+                    <div class="card-body text-center p-4">
+                        <h5 class="fw-bold {% if plan.name == 'Professional' %}text-primary{% endif %}">{{ plan.name }}</h5>
+                        <div class="display-6 fw-bold mb-3">
+                            ${{ plan.price_monthly }}<span class="fs-6 text-muted">/month</span>
+                        </div>
+                        <p class="text-muted mb-4">{{ plan.description }}</p>
+                        
+                        <ul class="list-unstyled mb-4">
+                            <li class="mb-2">
+                                <i class="bi bi-check text-success me-2"></i>
+                                {{ plan.emails_per_month|floatformat:0 }} emails/month
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check text-success me-2"></i>
+                                {{ plan.api_keys_limit }} API keys
+                            </li>
+                            {% if plan.custom_templates %}
+                            <li class="mb-2">
+                                <i class="bi bi-check text-success me-2"></i>
+                                Custom templates
+                            </li>
+                            {% endif %}
+                            {% if plan.attachments %}
+                            <li class="mb-2">
+                                <i class="bi bi-check text-success me-2"></i>
+                                Email attachments
+                            </li>
+                            {% endif %}
+                            {% if plan.webhooks %}
+                            <li class="mb-2">
+                                <i class="bi bi-check text-success me-2"></i>
+                                Webhooks & callbacks
+                            </li>
+                            {% endif %}
+                            {% if plan.analytics %}
+                            <li class="mb-2">
+                                <i class="bi bi-check text-success me-2"></i>
+                                Analytics & reporting
+                            </li>
+                            {% endif %}
+                            {% if plan.priority_support %}
+                            <li class="mb-2">
+                                <i class="bi bi-check text-success me-2"></i>
+                                Priority support
+                            </li>
+                            {% endif %}
+                        </ul>
+                        
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'billing' %}" class="btn {% if plan.name == 'Professional' %}btn-primary{% else %}btn-outline-primary{% endif %} w-100">
+                                {% if plan.name == 'Free Trial' %}Start Free Trial{% else %}Choose Plan{% endif %}
+                            </a>
+                        {% else %}
+                            <a href="{% url 'register' %}" class="btn {% if plan.name == 'Professional' %}btn-primary{% else %}btn-outline-primary{% endif %} w-100">
+                                {% if plan.name == 'Free Trial' %}Start Free Trial{% else %}Get Started{% endif %}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Annual Pricing Toggle -->
+        <div class="text-center mt-5">
+            <div class="form-check form-switch d-inline-block">
+                <input class="form-check-input" type="checkbox" id="annualToggle">
+                <label class="form-check-label" for="annualToggle">
+                    <strong>Save 20% with annual billing</strong>
+                </label>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Comparison -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-3">Feature Comparison</h2>
+                <p class="lead text-muted">
+                    See what's included in each plan to make the right choice for your needs.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Features</th>
+                                {% for plan in plans %}
+                                <th class="text-center">{{ plan.name }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Emails per month</strong></td>
+                                {% for plan in plans %}
+                                <td class="text-center">{{ plan.emails_per_month|floatformat:0 }}</td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td><strong>API Keys</strong></td>
+                                {% for plan in plans %}
+                                <td class="text-center">{{ plan.api_keys_limit }}</td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td><strong>Email Templates</strong></td>
+                                {% for plan in plans %}
+                                <td class="text-center">
+                                    {% if plan.custom_templates %}
+                                        <i class="bi bi-check text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-x text-muted"></i>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td><strong>Attachments</strong></td>
+                                {% for plan in plans %}
+                                <td class="text-center">
+                                    {% if plan.attachments %}
+                                        <i class="bi bi-check text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-x text-muted"></i>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td><strong>Webhooks</strong></td>
+                                {% for plan in plans %}
+                                <td class="text-center">
+                                    {% if plan.webhooks %}
+                                        <i class="bi bi-check text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-x text-muted"></i>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td><strong>Analytics</strong></td>
+                                {% for plan in plans %}
+                                <td class="text-center">
+                                    {% if plan.analytics %}
+                                        <i class="bi bi-check text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-x text-muted"></i>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td><strong>Priority Support</strong></td>
+                                {% for plan in plans %}
+                                <td class="text-center">
+                                    {% if plan.priority_support %}
+                                        <i class="bi bi-check text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-x text-muted"></i>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="text-center mb-5">Frequently Asked Questions</h2>
+                
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                What happens if I exceed my monthly email limit?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                If you exceed your monthly limit, we'll notify you and you can upgrade your plan or purchase additional emails. We won't cut off your service immediately to ensure continuity.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                Can I change my plan at any time?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately, and we'll prorate any billing differences.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                Is there a free trial available?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes! We offer a 14-day free trial with 1,000 emails included. No credit card required to get started.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                What payment methods do you accept?
+                            </button>
+                        </h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                We accept all major credit cards (Visa, MasterCard, American Express) and PayPal. All payments are processed securely through Stripe.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3">Ready to Get Started?</h2>
+                <p class="lead mb-4">
+                    Join thousands of developers who trust our email API for their applications.
+                </p>
+                <a href="{% url 'register' %}" class="btn btn-light btn-lg">
+                    <i class="bi bi-rocket-takeoff me-2"></i>Start Your Free Trial
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Annual pricing toggle functionality
+document.getElementById('annualToggle').addEventListener('change', function() {
+    const isAnnual = this.checked;
+    const priceElements = document.querySelectorAll('.display-6 .fw-bold');
+    
+    priceElements.forEach((element, index) => {
+        const plans = {{ plans|safe }};
+        if (plans[index]) {
+            const monthlyPrice = plans[index].price_monthly;
+            const yearlyPrice = plans[index].price_yearly;
+            const price = isAnnual ? yearlyPrice : monthlyPrice;
+            const period = isAnnual ? '/year' : '/month';
+            
+            element.innerHTML = `$${price}<span class="fs-6 text-muted">${period}</span>`;
+        }
+    });
+});
+</script>
+{% endblock %}

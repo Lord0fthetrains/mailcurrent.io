@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Privacy Policy - MailCurrent.io{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="display-4 fw-bold mb-4">Privacy Policy</h1>
+            <p class="text-muted mb-4">Last updated: {{ "now"|date:"F d, Y" }}</p>
+            
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">1. Information We Collect</h2>
+                    <p>We collect information you provide directly to us, such as when you create an account, use our services, or contact us for support.</p>
+                    
+                    <h3 class="h5 mt-4">Personal Information</h3>
+                    <ul>
+                        <li>Name and email address</li>
+                        <li>Company information (optional)</li>
+                        <li>Phone number (optional)</li>
+                        <li>Payment information (processed securely by Stripe)</li>
+                    </ul>
+                    
+                    <h3 class="h5 mt-4">Usage Information</h3>
+                    <ul>
+                        <li>API usage statistics and logs</li>
+                        <li>Email delivery metrics</li>
+                        <li>Account activity and preferences</li>
+                        <li>Device and browser information</li>
+                    </ul>
+                    
+                    <h2 class="h4 mb-3 mt-5">2. How We Use Your Information</h2>
+                    <p>We use the information we collect to:</p>
+                    <ul>
+                        <li>Provide, maintain, and improve our services</li>
+                        <li>Process transactions and send related information</li>
+                        <li>Send technical notices, updates, and support messages</li>
+                        <li>Respond to your comments and questions</li>
+                        <li>Monitor and analyze usage patterns</li>
+                        <li>Detect, prevent, and address technical issues</li>
+                    </ul>
+                    
+                    <h2 class="h4 mb-3 mt-5">3. Information Sharing</h2>
+                    <p>We do not sell, trade, or otherwise transfer your personal information to third parties except:</p>
+                    <ul>
+                        <li>With your explicit consent</li>
+                        <li>To comply with legal obligations</li>
+                        <li>To protect our rights and prevent fraud</li>
+                        <li>With service providers who assist in our operations (under strict confidentiality agreements)</li>
+                    </ul>
+                    
+                    <h2 class="h4 mb-3 mt-5">4. Data Security</h2>
+                    <p>We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. This includes:</p>
+                    <ul>
+                        <li>Encryption of data in transit and at rest</li>
+                        <li>Regular security assessments and updates</li>
+                        <li>Access controls and authentication</li>
+                        <li>Secure data centers and infrastructure</li>
+                    </ul>
+                    
+                    <h2 class="h4 mb-3 mt-5">5. Data Retention</h2>
+                    <p>We retain your personal information for as long as necessary to provide our services and fulfill the purposes outlined in this privacy policy, unless a longer retention period is required by law.</p>
+                    
+                    <h2 class="h4 mb-3 mt-5">6. Your Rights</h2>
+                    <p>Depending on your location, you may have the following rights regarding your personal information:</p>
+                    <ul>
+                        <li>Access to your personal information</li>
+                        <li>Correction of inaccurate information</li>
+                        <li>Deletion of your personal information</li>
+                        <li>Portability of your data</li>
+                        <li>Objection to processing</li>
+                        <li>Withdrawal of consent</li>
+                    </ul>
+                    
+                    <h2 class="h4 mb-3 mt-5">7. Cookies and Tracking</h2>
+                    <p>We use cookies and similar technologies to enhance your experience, analyze usage, and provide personalized content. You can control cookie preferences through your browser settings.</p>
+                    
+                    <h2 class="h4 mb-3 mt-5">8. Third-Party Services</h2>
+                    <p>Our services may integrate with third-party services (such as Stripe for payments). These services have their own privacy policies, and we encourage you to review them.</p>
+                    
+                    <h2 class="h4 mb-3 mt-5">9. International Transfers</h2>
+                    <p>Your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place for such transfers.</p>
+                    
+                    <h2 class="h4 mb-3 mt-5">10. Children's Privacy</h2>
+                    <p>Our services are not intended for children under 13. We do not knowingly collect personal information from children under 13.</p>
+                    
+                    <h2 class="h4 mb-3 mt-5">11. Changes to This Policy</h2>
+                    <p>We may update this privacy policy from time to time. We will notify you of any material changes by posting the new policy on this page and updating the "Last updated" date.</p>
+                    
+                    <h2 class="h4 mb-3 mt-5">12. Contact Us</h2>
+                    <p>If you have any questions about this privacy policy or our data practices, please contact us at:</p>
+                    <ul class="list-unstyled">
+                        <li><strong>Email:</strong> privacy@mailcurrent.io</li>
+                        <li><strong>Address:</strong> MailCurrent.io Privacy Team</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

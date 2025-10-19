@@ -1,0 +1,37 @@
+Email Quota Exceeded - {{ site_name }}
+
+Hello {{ user.first_name|default:user.email }},
+
+🚨 QUOTA EXCEEDED
+You have EXCEEDED your monthly email quota for {{ current_period }}.
+
+ACTION REQUIRED: Upgrade your plan to continue sending emails.
+
+CURRENT USAGE:
+- Emails sent this period: {{ emails_sent }} / {{ quota_limit }}
+- Overage: {{ overage_count }} emails
+- Current plan: {{ plan_name }}
+- Period resets: {{ reset_date }}
+
+WHAT HAPPENS NOW?
+- New email sending requests will be temporarily paused
+- You can upgrade your plan to resume service immediately
+- Your quota will reset on {{ reset_date }}
+- No data or settings will be lost
+
+UPGRADE YOUR PLAN NOW:
+https://mailcurrent.io/pricing
+
+VIEW YOUR DASHBOARD:
+https://mailcurrent.io/dashboard
+
+NEED HELP?
+Our support team is here to help you choose the right plan for your needs.
+Contact us at: support@mailcurrent.io
+
+Best regards,
+The {{ site_name }} Team
+
+---
+This notification was sent to {{ user.email }}
+© {{ current_year }} {{ site_name }}. All rights reserved.
