@@ -27,7 +27,7 @@ class AnalyticsService:
         
         # Add tracking pixel
         base_url = getattr(settings, 'BASE_URL', 'http://localhost:3099')
-        tracking_pixel = f'<img src="{base_url}/api/v1/track/open/{email_log.id}/{pixel_id}/" width="1" height="1" style="display:none;" />'
+        tracking_pixel = f'<img src="{base_url}/track/open/{email_log.id}/{pixel_id}/" width="1" height="1" style="display:none;" />'
         
         # Insert tracking pixel before closing body tag
         if '</body>' in html_content:
@@ -62,7 +62,7 @@ class AnalyticsService:
             
             # Create tracking URL
             base_url = getattr(settings, 'BASE_URL', 'http://localhost:3099')
-            tracking_url = f"{base_url}/api/v1/track/click/{email_log_id}/{link_id}/"
+            tracking_url = f"{base_url}/track/click/{email_log_id}/{link_id}/"
             
             # Replace href with tracking URL
             new_tag = re.sub(r'href=["\'][^"\']+["\']', f'href="{tracking_url}"', original_tag)

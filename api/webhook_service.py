@@ -129,7 +129,7 @@ class WebhookService:
         # Prepare event data
         webhook_data = {
             'email_log_id': email_log.id,
-            'to_email': email_log.to_email,
+            'to_email': email_log.to,
             'from_email': email_log.from_email,
             'subject': email_log.subject,
             'template_used': email_log.template_used,

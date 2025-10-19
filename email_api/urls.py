@@ -24,6 +24,8 @@ urlpatterns = [
     path('api/v1/', include('api.urls')),
     path('api/v1/accounts/', include('accounts.urls')),
     path('', include('frontend.urls')), # Added frontend URLs
+    # Public tracking endpoints (no authentication required)
+    path('track/', include('api.tracking_urls')),
 ]
 
 # Serve static files during development

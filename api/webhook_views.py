@@ -4,9 +4,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
 from django.utils import timezone
+from django.http import HttpResponse
 from .webhook_models import WebhookEndpoint, WebhookDelivery, EmailEvent, UnsubscribeList
 from .webhook_service import WebhookService, UnsubscribeService
 from .models import EmailLog
@@ -225,14 +225,14 @@ def resubscribe_email(request):
 
 
 @csrf_exempt
-@require_POST
 def email_tracking_pixel(request, email_log_id, pixel_id):
     """Handle email open tracking pixel"""
     try:
         email_log = get_object_or_404(EmailLog, id=email_log_id, tracking_pixel_id=pixel_id)
         
-        # Track open event
-        WebhookService.track_email_event(
+        # Create tracking event directly (simplified)
+        from .webhook_models import EmailEvent
+        EmailEvent.objects.create(
             email_log=email_log,
             event_type='opened',
             recipient_email=email_log.to,
@@ -241,18 +241,18 @@ def email_tracking_pixel(request, email_log_id, pixel_id):
                 'user_agent': request.META.get('HTTP_USER_AGENT', ''),
                 'timestamp': timezone.now().isoformat()
             },
-            request=request
+            ip_address=request.META.get('REMOTE_ADDR'),
+            user_agent=request.META.get('HTTP_USER_AGENT', '')
         )
         
-        # Return 1x1 transparent pixel
-        from django.http import HttpResponse
-        pixel_data = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xdb\x00\x00\x00\x00IEND\xaeB`\x82'
-        return HttpResponse(pixel_data, content_type='image/png')
+        logger.info(f"Email open tracked for {email_log.id}")
         
     except Exception as e:
         logger.error(f"Error tracking email open: {e}")
-        # Return empty response
-        return HttpResponse(status=204)
+    
+    # Always return 1x1 transparent pixel
+    pixel_data = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xdb\x00\x00\x00\x00IEND\xaeB`\x82'
+    return HttpResponse(pixel_data, content_type='image/png')
 
 
 @api_view(['GET'])
