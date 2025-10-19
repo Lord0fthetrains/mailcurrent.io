@@ -32,6 +32,12 @@
                                 <a class="nav-link" href="#logs">Email Logs</a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link" href="#tracking">Email Tracking</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#analytics">Analytics</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" href="#errors">Error Handling</a>
                             </li>
                         </ul>
@@ -365,6 +371,262 @@
                         
                         <h6 class="mt-4">Example Request</h6>
                         <pre><code>curl -X GET "{{ request.scheme }}://{{ request.get_host }}/api/v1/logs/?limit=10&status=sent" \
+  -H "X-API-Key: your-api-key"</code></pre>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Email Tracking -->
+            <section id="tracking" class="mb-5">
+                <h2 class="fw-bold mb-3">Email Tracking</h2>
+                <p>Track email opens and link clicks automatically with our built-in tracking system.</p>
+                
+                <div class="alert alert-info">
+                    <h5><i class="bi bi-info-circle me-2"></i>Automatic Tracking</h5>
+                    <p class="mb-0">All emails sent through our API automatically include tracking pixels and link tracking. No additional configuration required!</p>
+                </div>
+                
+                <h4 class="mt-4">Open Tracking</h4>
+                <p>Every email includes a 1x1 transparent pixel that tracks when the email is opened.</p>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">How It Works</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol>
+                            <li>Email is sent with a tracking pixel: <code>&lt;img src="https://mailcurrent.io/track/open/{email_id}/{pixel_id}/"&gt;</code></li>
+                            <li>When recipient opens email, pixel loads automatically</li>
+                            <li>Open event is recorded with IP address, user agent, and timestamp</li>
+                            <li>Data appears in your analytics dashboard</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <h4 class="mt-4">Link Click Tracking</h4>
+                <p>All links in your emails are automatically converted to tracking links that redirect to the original destination.</p>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">How It Works</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol>
+                            <li>Original link: <code>&lt;a href="https://example.com"&gt;Visit Site&lt;/a&gt;</code></li>
+                            <li>Automatically converted to: <code>&lt;a href="https://mailcurrent.io/track/click/{email_id}/{link_id}/?url=https%3A//example.com"&gt;Visit Site&lt;/a&gt;</code></li>
+                            <li>When clicked, tracks the event and redirects to original URL</li>
+                            <li>Click data includes original URL, IP address, user agent, and timestamp</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <h4 class="mt-4">Tracking Endpoints</h4>
+                <p>These endpoints are used internally by the tracking system and don't require authentication:</p>
+                
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">GET /track/open/{email_id}/{pixel_id}/</h5>
+                        <span class="badge bg-primary">Public</span>
+                    </div>
+                    <div class="card-body">
+                        <p>Returns a 1x1 transparent PNG pixel and records the open event.</p>
+                        <h6>Response</h6>
+                        <pre><code>HTTP/1.1 200 OK
+Content-Type: image/png
+
+[1x1 transparent PNG data]</code></pre>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">GET /track/click/{email_id}/{link_id}/?url={encoded_url}</h5>
+                        <span class="badge bg-primary">Public</span>
+                    </div>
+                    <div class="card-body">
+                        <p>Records the click event and redirects to the original URL.</p>
+                        <h6>Query Parameters</h6>
+                        <ul>
+                            <li><code>url</code> - The original URL (URL encoded)</li>
+                        </ul>
+                        <h6>Response</h6>
+                        <pre><code>HTTP/1.1 302 Found
+Location: {original_url}</code></pre>
+                    </div>
+                </div>
+                
+                <h4 class="mt-4">Excluded Links</h4>
+                <p>The following types of links are automatically excluded from tracking:</p>
+                <ul>
+                    <li>Unsubscribe links (containing "unsubscribe", "unsub", "opt-out")</li>
+                    <li>Protocol links ("mailto:", "tel:")</li>
+                </ul>
+                
+                <h4 class="mt-4">Tracking Data Structure</h4>
+                <p>Each tracking event includes detailed information about the interaction:</p>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Open Event Data</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre><code>{
+  "event_type": "opened",
+  "recipient_email": "user@example.com",
+  "email_subject": "Welcome to our service",
+  "event_data": {
+    "ip_address": "192.168.1.100",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "timestamp": "2024-01-15T10:30:00Z"
+  },
+  "created_at": "2024-01-15T10:30:00Z"
+}</code></pre>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">Click Event Data</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre><code>{
+  "event_type": "clicked",
+  "recipient_email": "user@example.com",
+  "email_subject": "Welcome to our service",
+  "event_data": {
+    "link_id": "abc12345",
+    "original_url": "https://example.com/landing-page",
+    "ip_address": "192.168.1.100",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "timestamp": "2024-01-15T10:35:00Z"
+  },
+  "created_at": "2024-01-15T10:35:00Z"
+}</code></pre>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <h5><i class="bi bi-exclamation-triangle me-2"></i>Privacy Considerations</h5>
+                    <p class="mb-0">Tracking data includes IP addresses and user agents. Ensure you comply with privacy regulations like GDPR and CCPA when collecting this data.</p>
+                </div>
+            </section>
+            
+            <!-- Analytics -->
+            <section id="analytics" class="mb-5">
+                <h2 class="fw-bold mb-3">Analytics & Reporting</h2>
+                <p>Access detailed analytics about your email campaigns through our dashboard and API.</p>
+                
+                <h4 class="mt-4">Dashboard Analytics</h4>
+                <p>View comprehensive analytics in your dashboard at <code>/dashboard/analytics/</code>:</p>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">Email Overview</h6>
+                                <ul class="list-unstyled">
+                                    <li>• Total emails sent</li>
+                                    <li>• Open rate percentage</li>
+                                    <li>• Click rate percentage</li>
+                                    <li>• Bounce rate percentage</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">Detailed Reports</h6>
+                                <ul class="list-unstyled">
+                                    <li>• Clicked links tracking</li>
+                                    <li>• Top recipients</li>
+                                    <li>• Template performance</li>
+                                    <li>• Recent events timeline</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h4 class="mt-4">Analytics API Endpoints</h4>
+                
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">GET /api/v1/analytics/</h5>
+                        <span class="badge bg-secondary">Analytics</span>
+                    </div>
+                    <div class="card-body">
+                        <p>Get comprehensive analytics data for your account.</p>
+                        <h6>Query Parameters</h6>
+                        <ul>
+                            <li><code>days</code> - Number of days to analyze (default: 30)</li>
+                        </ul>
+                        
+                        <h6>Example Request</h6>
+                        <pre><code>curl -X GET "{{ request.scheme }}://{{ request.get_host }}/api/v1/analytics/?days=7" \
+  -H "X-API-Key: your-api-key"</code></pre>
+                        
+                        <h6>Example Response</h6>
+                        <pre><code>{
+  "overview": {
+    "total_emails": 150,
+    "sent_emails": 145,
+    "failed_emails": 5,
+    "opens": 89,
+    "clicks": 23,
+    "bounces": 2
+  },
+  "rates": {
+    "open_rate": 61.38,
+    "click_rate": 15.86,
+    "bounce_rate": 1.38
+  },
+  "daily_breakdown": [...],
+  "template_performance": [...],
+  "recent_events": [...],
+  "top_recipients": [...]
+}</code></pre>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">GET /api/v1/analytics/clicked-links/</h5>
+                        <span class="badge bg-secondary">Analytics</span>
+                    </div>
+                    <div class="card-body">
+                        <p>Get detailed information about clicked links.</p>
+                        
+                        <h6>Example Response</h6>
+                        <pre><code>{
+  "clicked_links": [
+    {
+      "url": "https://example.com",
+      "click_count": 15,
+      "unique_clicks": 12,
+      "last_clicked": "2024-01-15T10:30:00Z",
+      "recipients": ["user1@example.com", "user2@example.com"]
+    }
+  ]
+}</code></pre>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">GET /api/v1/analytics/export/</h5>
+                        <span class="badge bg-secondary">Export</span>
+                    </div>
+                    <div class="card-body">
+                        <p>Export analytics data in CSV or JSON format.</p>
+                        <h6>Query Parameters</h6>
+                        <ul>
+                            <li><code>format</code> - Export format: "csv" or "json"</li>
+                            <li><code>days</code> - Number of days to export (default: 30)</li>
+                        </ul>
+                        
+                        <h6>Example Request</h6>
+                        <pre><code>curl -X GET "{{ request.scheme }}://{{ request.get_host }}/api/v1/analytics/export/?format=csv&days=7" \
   -H "X-API-Key: your-api-key"</code></pre>
                     </div>
                 </div>
