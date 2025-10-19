@@ -272,6 +272,17 @@ def dashboard_analytics_view(request):
     """Dashboard Analytics tab with comprehensive email tracking"""
     from api.analytics_service import AnalyticsService
     import json
+    from datetime import datetime, date
+    from django.utils import timezone
+    
+    # Custom JSON encoder to handle datetime objects
+    class DateTimeEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, (datetime, date)):
+                return obj.isoformat()
+            elif hasattr(obj, 'isoformat'):
+                return obj.isoformat()
+            return super().default(obj)
     
     # Get analytics data directly
     days = int(request.GET.get('days', 30))
@@ -286,7 +297,7 @@ def dashboard_analytics_view(request):
             'recent_events': recent_events,
             'top_recipients': top_recipients,
             'days': days
-        }),
+        }, cls=DateTimeEncoder),
         'current_period': days
     }
     return render(request, 'dashboard/analytics.html', context)
