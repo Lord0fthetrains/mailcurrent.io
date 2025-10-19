@@ -1,438 +1,266 @@
-# MailCurrent.io
+# MailCurrent.io - Email API Service
 
-A powerful Django REST Framework-based email microservice that provides both template-based and custom HTML email sending capabilities with API key authentication and comprehensive logging.
+A comprehensive Django-based email API service for sending transactional and marketing emails with advanced features like templates, analytics, and webhook support.
 
-## Features
+## 🚀 Features
 
-### Stage 1 (Current)
-- **Template-based emails** with Jinja2 variable substitution
-- **Custom HTML/text emails** with full content control
-- **API key authentication** with rate limiting
-- **Sender customization** (email, name, reply-to)
-- **Attachment support** (base64 encoded)
-- **Email logging** and statistics
-- **Admin panel** for management
-- **Postfix SMTP integration**
+### Core Email Functionality
+- **RESTful API** for sending emails via HTTP requests
+- **Template System** with Jinja2 templating engine
+- **Custom Email Support** with full HTML/text content
+- **SMTP Configuration** with custom SMTP server support
+- **Email Attachments** support
+- **Email Validation** and sanitization
 
-### Stage 2 (Future)
-- User accounts with registration/login
-- Pricing tiers with usage limits and feature restrictions
-- Stripe payment integration
-- Web dashboard for users
+### User Management
+- **User Authentication** with email verification
+- **API Key Management** with rate limiting
+- **Subscription Plans** with usage tracking
+- **Billing Integration** with Stripe
+- **Password Reset** and account recovery
 
-### Stage 3 (Future)
-- Webhooks and delivery status tracking
-- Unsubscribe management
-- Analytics and reporting
-- Advanced security features
-- Template versioning and testing
+### Dashboard & Analytics
+- **User Dashboard** with usage statistics
+- **Email Logs** with detailed tracking
+- **Analytics Service** for email performance
+- **Real-time Status** monitoring
+- **Usage Quotas** and notifications
 
-## Quick Start
+### Advanced Features
+- **Webhook Support** for email events
+- **Email Security** with spam detection
+- **DKIM/SPF/DMARC** verification
+- **Unsubscribe Management**
+- **Email Templates** with variable support
+- **Status Page** for service monitoring
+
+## 🛠️ Technology Stack
+
+- **Backend**: Django 5.2.7, Django REST Framework
+- **Database**: SQLite (development), PostgreSQL (production)
+- **Email**: SMTP with custom server support
+- **Templates**: Jinja2 templating engine
+- **Frontend**: Bootstrap 5, HTML/CSS/JavaScript
+- **Authentication**: Django Auth with token-based API
+- **Payments**: Stripe integration
+- **Security**: Bleach for HTML sanitization
+
+## 📁 Project Structure
+
+```
+Email-Api/
+├── accounts/                 # User management and authentication
+├── api/                     # Core API functionality
+├── frontend/                # Dashboard and web interface
+├── email_api/              # Django project settings
+├── templates/              # HTML templates
+├── static/                 # Static files (CSS, JS, images)
+├── requirements.txt        # Python dependencies
+└── manage.py              # Django management script
+```
+
+## 🚀 Quick Start
 
 ### Prerequisites
 - Python 3.12+
-- Postfix mail server (or any SMTP server)
-- Django 5.2+
+- pip
+- Git
 
 ### Installation
 
-1. **Clone and setup the project:**
-```bash
-cd /var/www/place/email-api
-pip3 install --user --break-system-packages -r requirements.txt
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Lord0fthetrains/mailcurrent.io.git
+   cd mailcurrent.io
+   ```
 
-2. **Configure environment variables:**
-```bash
-cp .env.example .env
-# Edit .env with your settings
-```
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-3. **Run migrations:**
-```bash
-python3 manage.py migrate
-```
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
 
-4. **Create superuser and sample data:**
-```bash
-python3 manage.py createsuperuser
-python3 manage.py setup_sample_data
-```
+4. **Run migrations**
+   ```bash
+   python manage.py migrate
+   ```
 
-5. **Start the development server:**
-```bash
-python3 manage.py runserver 0.0.0.0:3099
-```
+5. **Create superuser**
+   ```bash
+   python manage.py createsuperuser
+   ```
 
-## Configuration
+6. **Start development server**
+   ```bash
+   python manage.py runserver
+   ```
 
-### Environment Variables (.env)
+## 🔧 Configuration
+
+### Environment Variables
+Create a `.env` file with the following variables:
 
 ```env
-SECRET_KEY=your-secret-key-here
-DEBUG=False
-ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
-SMTP_HOST=localhost
-SMTP_PORT=25
-DEFAULT_FROM_EMAIL=noreply@yourdomain.com
-DEFAULT_FROM_NAME=MailCurrent.io
-RATE_LIMIT_PER_HOUR=1000
-ALLOWED_SENDER_DOMAINS=yourdomain.com,app.yourdomain.com
+SECRET_KEY=your-secret-key
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+DATABASE_URL=sqlite:///db.sqlite3
+
+# Email Configuration
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=your-email@gmail.com
+EMAIL_HOST_PASSWORD=your-app-password
+
+# Stripe Configuration
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Security
+ENCRYPTION_KEY=your-encryption-key
 ```
 
-### Postfix Configuration
-
-The service is configured to use Postfix on localhost:25. Ensure Postfix is running:
-
-```bash
-sudo systemctl status postfix
-sudo systemctl start postfix
-```
-
-## API Documentation
+## 📚 API Documentation
 
 ### Authentication
-
-All API requests require an API key in the `X-API-Key` header:
-
-```bash
-curl -H "X-API-Key: your-api-key-here" \
-     -H "Content-Type: application/json" \
-     http://localhost:3099/api/v1/validate/
+All API endpoints require authentication via API key in the header:
+```
+Authorization: Token your-api-key-here
 ```
 
-### Endpoints
-
-#### Send Template Email
+### Send Email
 ```bash
-POST /api/v1/send-template/
-```
+POST /api/v1/emails/send/
+Content-Type: application/json
+Authorization: Token your-api-key
 
-**Request Body:**
-```json
 {
-  "template": "welcome",
-  "to": "user@example.com",
-  "variables": {
-    "user_name": "John Doe",
-    "app_name": "MyApp"
-  },
-  "from_email": "notifications@yourdomain.com",
-  "from_name": "My App",
-  "reply_to": "support@yourdomain.com"
+    "to": "recipient@example.com",
+    "subject": "Hello World",
+    "html_content": "<h1>Hello!</h1><p>This is a test email.</p>",
+    "from_email": "sender@yourdomain.com",
+    "from_name": "Your Name"
 }
 ```
 
-#### Send Custom Email
+### Send Template Email
 ```bash
-POST /api/v1/send/
-```
+POST /api/v1/emails/send-template/
+Content-Type: application/json
+Authorization: Token your-api-key
 
-**Request Body:**
-```json
 {
-  "to": "user@example.com",
-  "subject": "Custom Subject",
-  "html": "<h1>Hello World</h1><p>This is a custom email.</p>",
-  "text": "Hello World\n\nThis is a custom email.",
-  "from_email": "custom@yourdomain.com",
-  "from_name": "Custom Sender",
-  "reply_to": "support@yourdomain.com",
-  "attachments": [
-    {
-      "filename": "document.pdf",
-      "content": "base64_encoded_content",
-      "mimetype": "application/pdf"
-    }
-  ],
-  "headers": {
-    "X-Custom-Header": "value"
-  }
-}
-```
-
-#### List Templates
-```bash
-GET /api/v1/templates/
-```
-
-#### Get Email Statistics
-```bash
-GET /api/v1/stats/?days=30
-```
-
-#### Validate API Key
-```bash
-GET /api/v1/validate/
-```
-
-#### Health Check
-```bash
-GET /api/v1/health/
-```
-
-### Admin Endpoints (Admin Only)
-
-#### List Email Logs
-```bash
-GET /api/v1/logs/?api_key_id=1&status=sent&page=1&page_size=50
-```
-
-#### Manage API Keys
-```bash
-GET /api/v1/api-keys/
-POST /api/v1/api-keys/
-GET /api/v1/api-keys/{id}/
-PUT /api/v1/api-keys/{id}/
-DELETE /api/v1/api-keys/{id}/
-```
-
-## Email Templates
-
-### Built-in Templates
-
-1. **welcome** - Welcome new users
-   - Required variables: `user_name`, `app_name`
-   - Optional: `welcome_message`, `features`, `verification_link`, `login_url`
-
-2. **verification** - Email verification
-   - Required variables: `user_name`, `app_name`, `verification_link`
-   - Optional: `verification_code`, `expiry_time`
-
-3. **notification** - General notifications
-   - Required variables: `user_name`, `app_name`, `notification_title`, `notification_message`
-   - Optional: `priority`, `details`, `action_url`, `action_text`
-
-### Template Variables
-
-Templates use Jinja2 syntax for variable substitution:
-
-```html
-<h1>Welcome to {{ app_name }}!</h1>
-<p>Hello {{ user_name }},</p>
-{% if features %}
-<ul>
-  {% for feature in features %}
-  <li>{{ feature }}</li>
-  {% endfor %}
-</ul>
-{% endif %}
-```
-
-## Usage Examples
-
-### Send Welcome Email
-```bash
-curl -X POST http://localhost:3099/api/v1/send-template/ \
-  -H "X-API-Key: tjZm0GwRGEHYX1WqMa_10VR3AycEhM5p86nywD6hHCA" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "template": "welcome",
-    "to": "user@example.com",
+    "template_name": "welcome",
+    "to": "recipient@example.com",
     "variables": {
-      "user_name": "John Doe",
-      "app_name": "MyApp",
-      "welcome_message": "Thanks for joining us!",
-      "features": ["Feature 1", "Feature 2", "Feature 3"]
+        "name": "John Doe",
+        "company": "Example Corp"
     }
-  }'
+}
 ```
 
-### Send Custom HTML Email
+## 🎯 Usage Examples
+
+### Python Client
+```python
+import requests
+
+api_key = "your-api-key"
+base_url = "https://api.mailcurrent.io"
+
+# Send custom email
+response = requests.post(
+    f"{base_url}/api/v1/emails/send/",
+    headers={"Authorization": f"Token {api_key}"},
+    json={
+        "to": "user@example.com",
+        "subject": "Welcome!",
+        "html_content": "<h1>Welcome to our service!</h1>"
+    }
+)
+```
+
+### cURL Example
 ```bash
-curl -X POST http://localhost:3099/api/v1/send/ \
-  -H "X-API-Key: tjZm0GwRGEHYX1WqMa_10VR3AycEhM5p86nywD6hHCA" \
+curl -X POST https://api.mailcurrent.io/api/v1/emails/send/ \
+  -H "Authorization: Token your-api-key" \
   -H "Content-Type: application/json" \
   -d '{
     "to": "user@example.com",
-    "subject": "Custom Newsletter",
-    "html": "<h1>Newsletter</h1><p>This is our monthly newsletter.</p>",
-    "text": "Newsletter\n\nThis is our monthly newsletter.",
-    "from_name": "Newsletter Team"
+    "subject": "Test Email",
+    "html_content": "<p>This is a test email.</p>"
   }'
 ```
 
-### Check API Key Status
-```bash
-curl -H "X-API-Key: tjZm0GwRGEHYX1WqMa_10VR3AycEhM5p86nywD6hHCA" \
-     http://localhost:3099/api/v1/validate/
-```
+## 🔒 Security Features
 
-## Admin Panel
+- **API Key Authentication** with rate limiting
+- **HTML Sanitization** to prevent XSS attacks
+- **Email Validation** and domain verification
+- **SMTP Security** with TLS/SSL support
+- **Password Encryption** for sensitive data
+- **CSRF Protection** for web forms
+- **SQL Injection Prevention** with Django ORM
 
-Access the Django admin panel at `http://localhost:3099/admin/` with:
-- Username: `admin`
-- Password: `admin123`
+## 📊 Monitoring & Analytics
 
-### Admin Features
-- **API Keys**: Create, edit, and manage API keys
-- **Email Templates**: Create and edit email templates
-- **Email Logs**: View all sent emails with detailed information
-- **Attachments**: View email attachments
+- **Email Delivery Tracking** with status updates
+- **Usage Analytics** with detailed metrics
+- **Error Logging** with comprehensive error tracking
+- **Performance Monitoring** with response time tracking
+- **Status Page** for service uptime monitoring
 
-## Database Models
-
-### APIKey
-- `key`: Unique API key (auto-generated)
-- `name`: Service identifier
-- `is_active`: Whether the key is active
-- `rate_limit`: Emails per hour limit
-- `default_from_email`: Default sender email
-- `default_from_name`: Default sender name
-- `allowed_domains`: List of allowed sender domains
-
-### EmailTemplate
-- `name`: Template identifier (slug)
-- `subject`: Email subject with variable support
-- `html_content`: HTML template content
-- `text_content`: Plain text template content
-- `required_variables`: List of required template variables
-
-### EmailLog
-- `to`: Recipient email
-- `subject`: Email subject
-- `status`: sent/failed/queued/bounced
-- `template_used`: Reference to template (if used)
-- `api_key`: Reference to API key used
-- `from_email`, `from_name`: Sender information
-- `sent_at`: Timestamp when sent
-- `error_message`: Error details (if failed)
-
-## Security Features
-
-- **API Key Authentication**: Secure API key-based authentication
-- **Rate Limiting**: Configurable rate limits per API key
-- **Domain Whitelisting**: Restrict sender domains per API key
-- **HTML Sanitization**: Bleach-based HTML sanitization
-- **Input Validation**: Comprehensive input validation
-- **CORS Configuration**: Configurable CORS settings
-
-## Monitoring and Logging
-
-- **Email Logs**: All emails are logged with full details
-- **Error Tracking**: Failed emails are logged with error messages
-- **Statistics**: Email statistics and usage tracking
-- **Admin Interface**: Comprehensive admin panel for monitoring
-
-## Deployment
+## 🚀 Deployment
 
 ### Production Setup
+1. **Configure production database** (PostgreSQL recommended)
+2. **Set up reverse proxy** (Nginx)
+3. **Configure SSL certificates**
+4. **Set up monitoring** and logging
+5. **Configure backup strategy**
 
-1. **Environment Configuration:**
+### Docker Deployment
 ```bash
-# Set production environment variables
-export DEBUG=False
-export SECRET_KEY=your-production-secret-key
-export ALLOWED_HOSTS=yourdomain.com,api.yourdomain.com
+# Build and run with Docker
+docker-compose up -d
 ```
 
-2. **Database Migration:**
-```bash
-python3 manage.py migrate
-python3 manage.py collectstatic
-```
+## 🤝 Contributing
 
-3. **Run with Gunicorn:**
-```bash
-pip install gunicorn
-gunicorn email_api.wsgi:application --bind 0.0.0.0:8000
-```
+This is a private repository for MailCurrent.io development. For internal development:
 
-4. **Nginx Configuration:**
-```nginx
-server {
-    listen 80;
-    server_name api.yourdomain.com;
-    
-    location / {
-        proxy_pass http://127.0.0.1:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-```
+1. Create a feature branch
+2. Make your changes
+3. Test thoroughly
+4. Submit a pull request
+5. Code review and merge
 
-### Systemd Service
+## 📄 License
 
-Create `/etc/systemd/system/email-api.service`:
+Private - All rights reserved. This software is proprietary to MailCurrent.io.
 
-```ini
-[Unit]
-Description=MailCurrent.io
-After=network.target
-
-[Service]
-User=www-data
-Group=www-data
-WorkingDirectory=/var/www/place/email-api
-ExecStart=/usr/bin/python3 manage.py runserver 0.0.0.0:3099
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Enable and start:
-```bash
-sudo systemctl enable email-api
-sudo systemctl start email-api
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Email not sending:**
-   - Check Postfix status: `sudo systemctl status postfix`
-   - Verify SMTP configuration in settings
-   - Check email logs in admin panel
-
-2. **API key authentication failing:**
-   - Verify API key is active
-   - Check rate limits
-   - Ensure correct header format: `X-API-Key`
-
-3. **Template rendering errors:**
-   - Check required variables are provided
-   - Verify Jinja2 syntax in templates
-   - Check template is active
-
-### Logs
-
-- Application logs: `/var/www/place/email-api/logs/email_api.log`
-- Django logs: Check admin panel for email logs
-- System logs: `journalctl -u email-api`
-
-## API Response Format
-
-### Success Response
-```json
-{
-  "success": true,
-  "message": "Email sent successfully",
-  "timestamp": "2024-01-15T10:30:00Z"
-}
-```
-
-### Error Response
-```json
-{
-  "success": false,
-  "error": "Template 'welcome' not found",
-  "errors": {
-    "template": ["Template 'welcome' not found or inactive"]
-  }
-}
-```
-
-## License
-
-This project is licensed under the MIT License.
-
-## Support
+## 🆘 Support
 
 For support and questions:
-- Check the admin panel for email logs and statistics
-- Review the API documentation above
-- Check system logs for detailed error information
+- **Email**: support@mailcurrent.io
+- **Documentation**: [API Docs](https://mailcurrent.io/docs)
+- **Status Page**: [Status](https://status.mailcurrent.io)
+
+## 🔄 Version History
+
+- **v1.0.0** - Initial release with core email functionality
+- **v1.1.0** - Added template system and analytics
+- **v1.2.0** - Enhanced security and webhook support
+- **v1.3.0** - Dashboard improvements and usage tracking
+
+---
+
+**MailCurrent.io** - Reliable Email API Service for Modern Applications
