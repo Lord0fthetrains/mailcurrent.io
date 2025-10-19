@@ -285,3 +285,94 @@ class AnalyticsService:
             })
         
         return hourly_stats
+    
+    @staticmethod
+    def get_delivery_status_stats(user, days=30):
+        """Get detailed delivery status statistics"""
+        end_date = timezone.now()
+        start_date = end_date - timezone.timedelta(days=days)
+        
+        email_logs = EmailLog.objects.filter(
+            api_key__created_by=user,
+            created_at__gte=start_date
+        )
+        
+        # Count by status
+        status_counts = {}
+        for status, _ in EmailLog.STATUS_CHOICES:
+            status_counts[status] = email_logs.filter(status=status).count()
+        
+        # Get delivery timeline
+        delivery_timeline = []
+        for i in range(days):
+            date = start_date + timezone.timedelta(days=i)
+            day_logs = email_logs.filter(created_at__date=date.date())
+            
+            delivery_timeline.append({
+                'date': date.date().isoformat(),
+                'delivered': day_logs.filter(status='sent').count(),
+                'failed': day_logs.filter(status='failed').count(),
+                'bounced': day_logs.filter(status='bounced').count(),
+                'queued': day_logs.filter(status='queued').count()
+            })
+        
+        return {
+            'status_breakdown': status_counts,
+            'delivery_timeline': delivery_timeline,
+            'total_emails': email_logs.count(),
+            'delivery_rate': (status_counts['sent'] / email_logs.count() * 100) if email_logs.count() > 0 else 0
+        }
+    
+    @staticmethod
+    def get_engagement_metrics(user, days=30):
+        """Get detailed engagement metrics"""
+        end_date = timezone.now()
+        start_date = end_date - timezone.timedelta(days=days)
+        
+        email_logs = EmailLog.objects.filter(
+            api_key__created_by=user,
+            created_at__gte=start_date,
+            status='sent'
+        )
+        
+        events = EmailEvent.objects.filter(
+            email_log__api_key__created_by=user,
+            created_at__gte=start_date
+        )
+        
+        # Calculate engagement rates
+        total_sent = email_logs.count()
+        unique_opens = events.filter(event_type='opened').values('email_log').distinct().count()
+        unique_clicks = events.filter(event_type='clicked').values('email_log').distinct().count()
+        
+        # Calculate click-to-open rate (CTOR)
+        ctor = (unique_clicks / unique_opens * 100) if unique_opens > 0 else 0
+        
+        # Get engagement by template
+        template_engagement = []
+        for template in EmailTemplate.objects.filter(emaillog__api_key__created_by=user).distinct():
+            template_logs = email_logs.filter(template_used=template)
+            template_events = events.filter(email_log__template_used=template)
+            
+            template_opens = template_events.filter(event_type='opened').values('email_log').distinct().count()
+            template_clicks = template_events.filter(event_type='clicked').values('email_log').distinct().count()
+            
+            template_engagement.append({
+                'template_name': template.name,
+                'emails_sent': template_logs.count(),
+                'unique_opens': template_opens,
+                'unique_clicks': template_clicks,
+                'open_rate': (template_opens / template_logs.count() * 100) if template_logs.count() > 0 else 0,
+                'click_rate': (template_clicks / template_logs.count() * 100) if template_logs.count() > 0 else 0,
+                'ctor': (template_clicks / template_opens * 100) if template_opens > 0 else 0
+            })
+        
+        return {
+            'total_sent': total_sent,
+            'unique_opens': unique_opens,
+            'unique_clicks': unique_clicks,
+            'open_rate': (unique_opens / total_sent * 100) if total_sent > 0 else 0,
+            'click_rate': (unique_clicks / total_sent * 100) if total_sent > 0 else 0,
+            'click_to_open_rate': ctor,
+            'template_engagement': template_engagement
+        }

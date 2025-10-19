@@ -16,6 +16,7 @@ urlpatterns = [
     # Dashboard (requires login)
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('dashboard/api/', views.dashboard_api_view, name='dashboard_api'),
+    path('dashboard/analytics/', views.dashboard_analytics_view, name='dashboard_analytics'),
     path('profile/', views.profile_view, name='profile'),
     path('billing/', views.billing_view, name='billing'),
     

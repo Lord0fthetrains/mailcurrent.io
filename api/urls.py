@@ -46,6 +46,9 @@ urlpatterns = [
     path('analytics/hourly/', analytics_views.hourly_stats, name='analytics-hourly'),
     path('analytics/performance/<int:email_log_id>/', analytics_views.email_performance, name='analytics-performance'),
     path('analytics/dashboard/', analytics_views.dashboard_summary, name='analytics-dashboard'),
+    path('analytics/delivery-status/', analytics_views.delivery_status, name='analytics-delivery-status'),
+    path('analytics/engagement/', analytics_views.engagement_metrics, name='analytics-engagement'),
+    path('analytics/export/', analytics_views.export_analytics, name='analytics-export'),
     
     # Health check
     path('health/', views.health_check, name='health'),

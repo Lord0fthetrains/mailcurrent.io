@@ -1,0 +1,564 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Analytics & Tracking - MailCurrent.io{% endblock %}
+
+{% block extra_css %}
+<style>
+    .analytics-card {
+        transition: transform 0.2s;
+    }
+    .analytics-card:hover {
+        transform: translateY(-2px);
+    }
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+    .metric-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
+    .event-timeline {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .event-item {
+        border-left: 3px solid #e9ecef;
+        padding-left: 1rem;
+        margin-bottom: 1rem;
+    }
+    .event-item.opened { border-left-color: #28a745; }
+    .event-item.clicked { border-left-color: #007bff; }
+    .event-item.bounced { border-left-color: #dc3545; }
+    .event-item.complained { border-left-color: #ffc107; }
+    .event-item.unsubscribed { border-left-color: #6c757d; }
+    .rate-indicator {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    .rate-good { background-color: #d4edda; color: #155724; }
+    .rate-average { background-color: #fff3cd; color: #856404; }
+    .rate-poor { background-color: #f8d7da; color: #721c24; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3 mb-0">Analytics & Tracking</h1>
+            <p class="text-muted">Track email opens, clicks, and delivery status with detailed analytics and reporting.</p>
+        </div>
+        <div class="col-auto">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-primary" onclick="refreshAnalytics()">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+                <button type="button" class="btn btn-outline-success" onclick="exportAnalytics()">
+                    <i class="bi bi-download"></i> Export
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Time Period Selector -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h6 class="mb-0">Analytics Period</h6>
+                            <small class="text-muted">Select the time period for analytics data</small>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="period" id="period7" value="7" checked>
+                                <label class="btn btn-outline-primary" for="period7">7 Days</label>
+                                
+                                <input type="radio" class="btn-check" name="period" id="period30" value="30">
+                                <label class="btn btn-outline-primary" for="period30">30 Days</label>
+                                
+                                <input type="radio" class="btn-check" name="period" id="period90" value="90">
+                                <label class="btn btn-outline-primary" for="period90">90 Days</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card analytics-card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="metric-label">Emails Sent</div>
+                            <div class="metric-value" id="emailsSent">-</div>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-envelope-fill fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card analytics-card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="metric-label">Open Rate</div>
+                            <div class="metric-value" id="openRate">-</div>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-eye-fill fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card analytics-card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="metric-label">Click Rate</div>
+                            <div class="metric-value" id="clickRate">-</div>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-cursor-fill fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card analytics-card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="metric-label">Bounce Rate</div>
+                            <div class="metric-value" id="bounceRate">-</div>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-exclamation-triangle-fill fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <!-- Email Volume Chart -->
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Email Volume Over Time</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="volumeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Event Distribution -->
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Event Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="eventChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Analytics -->
+    <div class="row mb-4">
+        <!-- Template Performance -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Template Performance</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Template</th>
+                                    <th>Sent</th>
+                                    <th>Opens</th>
+                                    <th>Clicks</th>
+                                    <th>Open Rate</th>
+                                    <th>Click Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody id="templateTable">
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top Recipients -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Top Recipients</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Sent</th>
+                                    <th>Opens</th>
+                                    <th>Clicks</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recipientsTable">
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Events Timeline -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Events Timeline</h5>
+                </div>
+                <div class="card-body">
+                    <div class="event-timeline" id="eventsTimeline">
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-clock fs-1 mb-3"></i>
+                            <p>Loading recent events...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Modal -->
+<div class="modal fade" id="exportModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Export Analytics</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="exportFormat" class="form-label">Export Format</label>
+                    <select class="form-select" id="exportFormat">
+                        <option value="csv">CSV</option>
+                        <option value="json">JSON</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="exportPeriod" class="form-label">Time Period</label>
+                    <select class="form-select" id="exportPeriod">
+                        <option value="7">Last 7 days</option>
+                        <option value="30">Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="downloadExport()">Download</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let volumeChart, eventChart;
+let currentPeriod = 7;
+
+// Initialize analytics on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadAnalytics();
+    
+    // Set up period change listeners
+    document.querySelectorAll('input[name="period"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            currentPeriod = parseInt(this.value);
+            loadAnalytics();
+        });
+    });
+});
+
+async function loadAnalytics() {
+    try {
+        // Show loading state
+        showLoadingState();
+        
+        // Load analytics data
+        const [statsResponse, eventsResponse, recipientsResponse] = await Promise.all([
+            fetch(`/api/v1/analytics/stats/?days=${currentPeriod}`),
+            fetch(`/api/v1/analytics/events/?limit=20`),
+            fetch(`/api/v1/analytics/recipients/?limit=10`)
+        ]);
+        
+        const stats = await statsResponse.json();
+        const events = await eventsResponse.json();
+        const recipients = await recipientsResponse.json();
+        
+        if (stats.success) {
+            updateMetrics(stats.stats);
+            updateCharts(stats.stats);
+            updateTemplateTable(stats.stats.template_performance);
+        }
+        
+        if (events.success) {
+            updateEventsTimeline(events.events);
+        }
+        
+        if (recipients.success) {
+            updateRecipientsTable(recipients.recipients);
+        }
+        
+    } catch (error) {
+        console.error('Error loading analytics:', error);
+        showError('Failed to load analytics data');
+    }
+}
+
+function updateMetrics(stats) {
+    document.getElementById('emailsSent').textContent = stats.overview.sent_emails || 0;
+    document.getElementById('openRate').textContent = (stats.rates.open_rate || 0) + '%';
+    document.getElementById('clickRate').textContent = (stats.rates.click_rate || 0) + '%';
+    document.getElementById('bounceRate').textContent = (stats.rates.bounce_rate || 0) + '%';
+}
+
+function updateCharts(stats) {
+    // Update volume chart
+    if (volumeChart) {
+        volumeChart.destroy();
+    }
+    
+    const ctx1 = document.getElementById('volumeChart').getContext('2d');
+    volumeChart = new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: stats.daily_breakdown.map(day => day.date),
+            datasets: [{
+                label: 'Emails Sent',
+                data: stats.daily_breakdown.map(day => day.emails_sent),
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Opens',
+                data: stats.daily_breakdown.map(day => day.opens),
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Clicks',
+                data: stats.daily_breakdown.map(day => day.clicks),
+                borderColor: '#17a2b8',
+                backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    
+    // Update event distribution chart
+    if (eventChart) {
+        eventChart.destroy();
+    }
+    
+    const ctx2 = document.getElementById('eventChart').getContext('2d');
+    eventChart = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: ['Opens', 'Clicks', 'Bounces', 'Complaints', 'Unsubscribes'],
+            datasets: [{
+                data: [
+                    stats.overview.opens,
+                    stats.overview.clicks,
+                    stats.overview.bounces,
+                    stats.overview.complaints,
+                    stats.overview.unsubscribes
+                ],
+                backgroundColor: [
+                    '#28a745',
+                    '#007bff',
+                    '#dc3545',
+                    '#ffc107',
+                    '#6c757d'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+function updateTemplateTable(templates) {
+    const tbody = document.getElementById('templateTable');
+    if (templates.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No template data available</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = templates.map(template => `
+        <tr>
+            <td>${template.template_name}</td>
+            <td>${template.emails_sent}</td>
+            <td>${template.opens}</td>
+            <td>${template.clicks}</td>
+            <td><span class="rate-indicator ${getRateClass(template.open_rate)}">${template.open_rate.toFixed(1)}%</span></td>
+            <td><span class="rate-indicator ${getRateClass(template.click_rate)}">${template.click_rate.toFixed(1)}%</span></td>
+        </tr>
+    `).join('');
+}
+
+function updateRecipientsTable(recipients) {
+    const tbody = document.getElementById('recipientsTable');
+    if (recipients.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No recipient data available</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = recipients.map(recipient => `
+        <tr>
+            <td>${recipient.to}</td>
+            <td>${recipient.email_count}</td>
+            <td>${recipient.open_count || 0}</td>
+            <td>${recipient.click_count || 0}</td>
+        </tr>
+    `).join('');
+}
+
+function updateEventsTimeline(events) {
+    const timeline = document.getElementById('eventsTimeline');
+    if (events.length === 0) {
+        timeline.innerHTML = '<div class="text-center text-muted py-4"><i class="bi bi-clock fs-1 mb-3"></i><p>No recent events</p></div>';
+        return;
+    }
+    
+    timeline.innerHTML = events.map(event => `
+        <div class="event-item ${event.event_type}">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <strong>${event.event_type.charAt(0).toUpperCase() + event.event_type.slice(1)}</strong>
+                    <span class="text-muted">- ${event.recipient_email}</span>
+                    <br>
+                    <small class="text-muted">${event.email_subject}</small>
+                </div>
+                <small class="text-muted">${new Date(event.created_at).toLocaleString()}</small>
+            </div>
+        </div>
+    `).join('');
+}
+
+function getRateClass(rate) {
+    if (rate >= 20) return 'rate-good';
+    if (rate >= 10) return 'rate-average';
+    return 'rate-poor';
+}
+
+function showLoadingState() {
+    document.getElementById('emailsSent').textContent = '...';
+    document.getElementById('openRate').textContent = '...';
+    document.getElementById('clickRate').textContent = '...';
+    document.getElementById('bounceRate').textContent = '...';
+}
+
+function showError(message) {
+    // You can implement a toast notification here
+    console.error(message);
+}
+
+function refreshAnalytics() {
+    loadAnalytics();
+}
+
+function exportAnalytics() {
+    const modal = new bootstrap.Modal(document.getElementById('exportModal'));
+    modal.show();
+}
+
+function downloadExport() {
+    const format = document.getElementById('exportFormat').value;
+    const period = document.getElementById('exportPeriod').value;
+    
+    // Create download URL
+    const url = `/api/v1/analytics/export/?format=${format}&days=${period}`;
+    
+    // Trigger download
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `analytics-${period}days.${format}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Close modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('exportModal'));
+    modal.hide();
+}
+</script>
+{% endblock %}

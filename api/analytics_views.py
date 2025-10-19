@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from .analytics_service import AnalyticsService
 from .webhook_models import EmailEvent
 from .models import EmailLog
@@ -182,6 +183,101 @@ def dashboard_summary(request):
         
     except Exception as e:
         logger.error(f"Error getting dashboard summary: {e}")
+        return Response({
+            'success': False,
+            'message': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def delivery_status(request):
+    """Get detailed delivery status statistics"""
+    try:
+        days = int(request.GET.get('days', 30))
+        if days > 365:
+            days = 365  # Limit to 1 year max
+        
+        stats = AnalyticsService.get_delivery_status_stats(request.user, days)
+        
+        return Response({
+            'success': True,
+            'delivery_stats': stats
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting delivery status: {e}")
+        return Response({
+            'success': False,
+            'message': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def engagement_metrics(request):
+    """Get detailed engagement metrics"""
+    try:
+        days = int(request.GET.get('days', 30))
+        if days > 365:
+            days = 365  # Limit to 1 year max
+        
+        metrics = AnalyticsService.get_engagement_metrics(request.user, days)
+        
+        return Response({
+            'success': True,
+            'engagement_metrics': metrics
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting engagement metrics: {e}")
+        return Response({
+            'success': False,
+            'message': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def export_analytics(request):
+    """Export analytics data in various formats"""
+    try:
+        format_type = request.GET.get('format', 'csv')
+        days = int(request.GET.get('days', 30))
+        
+        if format_type not in ['csv', 'json']:
+            return Response({
+                'success': False,
+                'message': 'Invalid format. Supported formats: csv, json'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get comprehensive analytics data
+        stats = AnalyticsService.get_email_stats(request.user, days)
+        delivery_stats = AnalyticsService.get_delivery_status_stats(request.user, days)
+        engagement_metrics = AnalyticsService.get_engagement_metrics(request.user, days)
+        
+        if format_type == 'json':
+            return Response({
+                'success': True,
+                'data': {
+                    'email_stats': stats,
+                    'delivery_stats': delivery_stats,
+                    'engagement_metrics': engagement_metrics,
+                    'exported_at': timezone.now().isoformat(),
+                    'period_days': days
+                }
+            })
+        
+        # For CSV export, you would implement CSV generation here
+        # This is a simplified response - in production you'd generate actual CSV
+        return Response({
+            'success': True,
+            'message': 'CSV export functionality would be implemented here',
+            'data_available': True
+        })
+        
+    except Exception as e:
+        logger.error(f"Error exporting analytics: {e}")
         return Response({
             'success': False,
             'message': str(e)

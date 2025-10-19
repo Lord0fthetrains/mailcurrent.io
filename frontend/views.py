@@ -268,6 +268,15 @@ def dashboard_api_view(request):
 
 
 @login_required
+def dashboard_analytics_view(request):
+    """Dashboard Analytics tab with comprehensive email tracking"""
+    context = {
+        'user': request.user
+    }
+    return render(request, 'dashboard/analytics.html', context)
+
+
+@login_required
 @require_http_methods(["POST"])
 def create_api_key(request):
     """Create a new API key via AJAX"""
