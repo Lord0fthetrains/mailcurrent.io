@@ -60,9 +60,11 @@ class AnalyticsService:
             # Generate link ID
             link_id = str(uuid.uuid4())[:8]
             
-            # Create tracking URL
+            # Create tracking URL with original URL encoded
             base_url = getattr(settings, 'BASE_URL', 'http://localhost:3099')
-            tracking_url = f"{base_url}/track/click/{email_log_id}/{link_id}/"
+            import urllib.parse
+            encoded_url = urllib.parse.quote(url, safe='')
+            tracking_url = f"{base_url}/track/click/{email_log_id}/{link_id}/?url={encoded_url}"
             
             # Replace href with tracking URL
             new_tag = re.sub(r'href=["\'][^"\']+["\']', f'href="{tracking_url}"', original_tag)

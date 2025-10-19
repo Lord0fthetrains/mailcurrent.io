@@ -261,6 +261,13 @@ def link_click_tracking(request, email_log_id, link_id):
     try:
         email_log = get_object_or_404(EmailLog, id=email_log_id)
         
+        # Get the original URL from query parameters
+        original_url = request.GET.get('url', 'https://mailcurrent.io')
+        
+        # Decode the URL if it was encoded
+        import urllib.parse
+        original_url = urllib.parse.unquote(original_url)
+        
         # Create tracking event directly (simplified)
         from .webhook_models import EmailEvent
         EmailEvent.objects.create(
@@ -269,6 +276,7 @@ def link_click_tracking(request, email_log_id, link_id):
             recipient_email=email_log.to,
             event_data={
                 'link_id': link_id,
+                'original_url': original_url,
                 'ip_address': request.META.get('REMOTE_ADDR'),
                 'user_agent': request.META.get('HTTP_USER_AGENT', ''),
                 'timestamp': timezone.now().isoformat()
@@ -277,11 +285,11 @@ def link_click_tracking(request, email_log_id, link_id):
             user_agent=request.META.get('HTTP_USER_AGENT', '')
         )
         
-        logger.info(f"Link click tracked for {email_log.id}, link {link_id}")
+        logger.info(f"Link click tracked for {email_log.id}, link {link_id}, URL: {original_url}")
         
-        # For now, redirect to a default URL (you can implement URL mapping later)
+        # Redirect to the original URL
         from django.shortcuts import redirect
-        return redirect('https://mailcurrent.io')
+        return redirect(original_url)
         
     except Exception as e:
         logger.error(f"Error tracking link click: {e}")

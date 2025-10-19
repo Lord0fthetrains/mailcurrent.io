@@ -259,6 +259,37 @@
         </div>
     </div>
 
+    <!-- Clicked Links -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Clicked Links</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Link</th>
+                                    <th>Recipient</th>
+                                    <th>Subject</th>
+                                    <th>Clicks</th>
+                                    <th>Last Clicked</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clickedLinksTable">
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Recent Events Timeline -->
     <div class="row">
         <div class="col-12">
@@ -354,6 +385,7 @@ function loadAnalytics() {
         updateTemplateTable(stats.template_performance);
         updateEventsTimeline(events);
         updateRecipientsTable(recipients);
+        updateClickedLinksTable(events);
         
     } catch (error) {
         console.error('Error loading analytics:', error);
@@ -481,6 +513,55 @@ function updateRecipientsTable(recipients) {
             <td>${recipient.email_count}</td>
             <td>${recipient.open_count || 0}</td>
             <td>${recipient.click_count || 0}</td>
+        </tr>
+    `).join('');
+}
+
+function updateClickedLinksTable(events) {
+    const tbody = document.getElementById('clickedLinksTable');
+    
+    // Filter only click events and group by URL
+    const clickEvents = events.filter(event => event.event_type === 'clicked');
+    
+    if (clickEvents.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No clicked links</td></tr>';
+        return;
+    }
+    
+    // Group clicks by URL
+    const linkGroups = {};
+    clickEvents.forEach(event => {
+        const url = event.event_data?.original_url || 'Unknown URL';
+        if (!linkGroups[url]) {
+            linkGroups[url] = {
+                url: url,
+                recipient: event.recipient_email,
+                subject: event.email_subject,
+                clicks: 0,
+                lastClicked: event.created_at
+            };
+        }
+        linkGroups[url].clicks++;
+        if (new Date(event.created_at) > new Date(linkGroups[url].lastClicked)) {
+            linkGroups[url].lastClicked = event.created_at;
+        }
+    });
+    
+    // Convert to array and sort by clicks
+    const linkData = Object.values(linkGroups).sort((a, b) => b.clicks - a.clicks);
+    
+    tbody.innerHTML = linkData.map(link => `
+        <tr>
+            <td>
+                <a href="${link.url}" target="_blank" class="text-decoration-none">
+                    ${link.url.length > 50 ? link.url.substring(0, 50) + '...' : link.url}
+                    <i class="bi bi-box-arrow-up-right ms-1"></i>
+                </a>
+            </td>
+            <td>${link.recipient}</td>
+            <td>${link.subject || 'N/A'}</td>
+            <td><span class="badge bg-primary">${link.clicks}</span></td>
+            <td>${new Date(link.lastClicked).toLocaleString()}</td>
         </tr>
     `).join('');
 }
